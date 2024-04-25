@@ -12,4 +12,6 @@ class HenryColors {
   static Color purple = Colors.purple;
   static Color transparent = Colors.transparent;
   static Color puti = Colors.white;
+  static Color itim = Colors.black;
+  static Color itim12 = Colors.black12;
 }

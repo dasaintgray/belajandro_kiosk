@@ -79,86 +79,88 @@ class WeatherAndClock extends StatelessWidget {
                     child: SizedBox(
                       height: orientation == Orientation.landscape ? 12.h : 6.h,
                       width: 5.w,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      'Temp: ${sc.weatherList.first.current.tempC.round()} ºC',
-                                      style: TextStyle(
-                                        color: HenryColors.puti,
-                                        fontSize: 11.sp,
-                                        // fontFamily: 'Roboto',
+                      child: Obx(
+                        () => Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        'Temp: ${sc.weatherList.first.current.tempC.round()} ºC',
+                                        style: TextStyle(
+                                          color: HenryColors.puti,
+                                          fontSize: 11.sp,
+                                          // fontFamily: 'Roboto',
+                                        ),
+                                        textAlign: TextAlign.start,
                                       ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                    Text(
-                                      'Feels: ${sc.weatherList.first.current.feelslikeC.round()} ºC',
-                                      style: TextStyle(
-                                        color: HenryColors.puti,
-                                        fontSize: 11.sp,
-                                        // fontFamily: 'Roboto',
+                                      Text(
+                                        'Feels: ${sc.weatherList.first.current.feelslikeC.round()} ºC',
+                                        style: TextStyle(
+                                          color: HenryColors.puti,
+                                          fontSize: 11.sp,
+                                          // fontFamily: 'Roboto',
+                                        ),
+                                        textAlign: TextAlign.start,
                                       ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                    Text(
-                                      'Humidity: ${sc.weatherList.first.current.humidity.round()} %',
-                                      style: TextStyle(
-                                        color: HenryColors.puti,
-                                        fontSize: 9.sp,
-                                        // fontFamily: 'Roboto',
+                                      Text(
+                                        'Humidity: ${sc.weatherList.first.current.humidity.round()} %',
+                                        style: TextStyle(
+                                          color: HenryColors.puti,
+                                          fontSize: 9.sp,
+                                          // fontFamily: 'Roboto',
+                                        ),
+                                        textAlign: TextAlign.start,
                                       ),
-                                      textAlign: TextAlign.start,
-                                    ),
-                                    Text(
-                                      sc.weatherList.first.current.condition.text,
-                                      style: TextStyle(
-                                        color: HenryColors.puti,
-                                        fontSize: 9.sp,
-                                        // fontFamily: 'Roboto',
-                                        overflow: TextOverflow.ellipsis,
+                                      Text(
+                                        sc.weatherList.first.current.condition.text,
+                                        style: TextStyle(
+                                          color: HenryColors.puti,
+                                          fontSize: 9.sp,
+                                          // fontFamily: 'Roboto',
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: SizedBox(
-                                  height: orientation == Orientation.landscape ? 8.h : 4.h,
-                                  child: Image.network(
-                                    sc.imgURL.value,
-                                    fit: BoxFit.contain,
-                                    height: 5.h,
-                                    width: 9.w,
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                          ),
-                          Text(
-                            '${sc.weatherList.first.location.name}, ${sc.weatherList.first.location.country}',
-                            style: TextStyle(
-                              color: HenryColors.puti,
-                              fontSize: 10.sp,
-                              // fontFamily: 'Roboto',
-                              overflow: TextOverflow.ellipsis,
+                                Expanded(
+                                  flex: 1,
+                                  child: SizedBox(
+                                    height: orientation == Orientation.landscape ? 8.h : 4.h,
+                                    child: Image.network(
+                                      sc.imgURL.value,
+                                      fit: BoxFit.contain,
+                                      height: 5.h,
+                                      width: 9.w,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                            ),
+                            Text(
+                              sc.weatherLocation.value,
+                              style: TextStyle(
+                                color: HenryColors.puti,
+                                fontSize: 10.sp,
+                                // fontFamily: 'Roboto',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -202,13 +204,6 @@ class WeatherAndClock extends StatelessWidget {
             ],
           ),
         ),
-        // SizedBox(
-        //   height: orientation == Orientation.landscape ? 10.h : 8.h,
-        //   child: Image.asset(
-        //     'assets/img/belajandro_256.png',
-        //     fit: BoxFit.contain,
-        //   ),
-        // ),
       ],
     );
   }

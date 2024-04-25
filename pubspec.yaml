@@ -25,6 +25,9 @@ dependencies:
   ffi: ^2.1.2
   window_manager: ^0.3.8
 
+  #VISUAL
+  flutter_animate: ^4.5.0
+
 dev_dependencies: 
   flutter_lints: ^3.0.0
   flutter_test: 

@@ -43,9 +43,10 @@ class ScreenView extends GetView<ScreenController> {
                     children: [
                       Expanded(
                         flex: 1,
-                        child: SizedBox(
-                          height: 12.h,
+                        child: Container(
+                          height: 15.h,
                           width: 5.w,
+                          color: HenryColors.teal,
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Image.asset(
@@ -60,9 +61,10 @@ class ScreenView extends GetView<ScreenController> {
                       Obx(
                         () => Expanded(
                           flex: 3,
-                          child: SizedBox(
-                            height: 12.h,
+                          child: Container(
+                            height: 15.h,
                             width: 30.w,
+                            color: HenryColors.blueAccent,
                             child: sc.isLoading.value
                                 ? SizedBox(
                                     height: 5.h,
@@ -141,8 +143,8 @@ class ScreenView extends GetView<ScreenController> {
                       Expanded(
                         flex: 1,
                         child: Container(
-                          height: 12.h,
-                          width: 15.w,
+                          height: 15.h,
+                          width: 20.w,
                           color: HenryColors.green,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -177,28 +179,28 @@ class ScreenView extends GetView<ScreenController> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: orientation == Orientation.landscape ? 10.h : 20.h,
-                    width: double.infinity,
-                  ),
-                  SizedBox(
-                    height: orientation == Orientation.landscape ? 45.h : 25.h,
-                    width: double.infinity,
-                    child: Image.asset(
-                      'assets/img/belajandro_logo.png',
-                      fit: BoxFit.contain,
-                      height: 15.h,
-                      width: 15.w,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                    width: 35.w,
-                    child: Image.asset(
-                      'assets/img/tap.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
+                  // SizedBox(
+                  //   height: orientation == Orientation.landscape ? 10.h : 25.h,
+                  //   width: double.infinity,
+                  // ),
+                  // SizedBox(
+                  //   height: orientation == Orientation.landscape ? 45.h : 20.h,
+                  //   width: double.infinity,
+                  //   child: Image.asset(
+                  //     'assets/img/belajandro_logo.png',
+                  //     fit: BoxFit.contain,
+                  //     height: 15.h,
+                  //     width: 15.w,
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   height: 15.h,
+                  //   width: 35.w,
+                  //   child: Image.asset(
+                  //     'assets/img/tap.png',
+                  //     fit: BoxFit.contain,
+                  //   ),
+                  // ),
                 ],
               ),
             ),

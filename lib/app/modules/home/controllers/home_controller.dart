@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
-  final count = 0.obs;
+  // integer area
+  final languageID = 0.obs;
+
   @override
   void onInit() async {
     super.onInit();
@@ -23,6 +25,4 @@ class HomeController extends GetxController {
   (double? sW, double? sH) getScreenSize(BuildContext context) {
     return (context.width, context.height);
   }
-
-  
 }

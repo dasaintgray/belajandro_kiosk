@@ -26,7 +26,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(1080, 1920);
+  Win32Window::Size size(1920, 720);
 
   // set window position to top-right corner
   // Get the size of the primary monitor

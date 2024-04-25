@@ -27,7 +27,9 @@ class ScreenController extends GetxController with BaseController {
 
   // string
   final imgURL = ''.obs;
+  final weatherLocation = ''.obs;
   final oras = ''.obs;
+  final sCITY = ''.obs;
 
   final tokyo = ''.obs;
   final sydney = ''.obs;
@@ -48,19 +50,24 @@ class ScreenController extends GetxController with BaseController {
 
     await windowManager.ensureInitialized();
 
-    WindowOptions windowOptions = const WindowOptions(
-      size: Size(1080, 1920),
-      center: true,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.hidden,
-    );
+    if (GetPlatform.isWindows) {
+      WindowOptions windowOptions = const WindowOptions(
+        size: Size(1080, 1920),
+        center: true,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.hidden,
+      );
 
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.setAlignment(Alignment.center);
-      await windowManager.setFullScreen(true);
-      await windowManager.focus();
-      await windowManager.show();
-    });
+      windowManager.waitUntilReadyToShow(
+        windowOptions,
+        () async {
+          await windowManager.setAlignment(Alignment.center);
+          await windowManager.setFullScreen(true);
+          await windowManager.focus();
+          await windowManager.show();
+        },
+      );
+    }
 
     final settingResponse = await getSettings(
       accessHeader: GlobalConstant.globalHeader,
@@ -69,9 +76,16 @@ class ScreenController extends GetxController with BaseController {
     );
     if (settingResponse != null) {
       settingsList.add(settingResponse);
-      final response = await getWeather('Angeles City');
+
+      final indexKey = settingsList.first.data.settings.indexWhere((element) => element.code == 'CITY');
+      sCITY.value = settingsList.first.data.settings[indexKey].value;
+
+      final response = await getWeather(sCITY.value);
       if (response) {
         isLoading.value = false;
+        autoFetchWeather(
+          duration: const Duration(minutes: 1),
+        );
       }
     }
   }
@@ -125,11 +139,21 @@ class ScreenController extends GetxController with BaseController {
     );
   }
 
+  void autoFetchWeather({required Duration duration}) {
+    Timer.periodic(duration, (timer) async {
+      await getWeather('New York');
+    });
+  }
+
   Future<bool> getWeather(String? cityName) async {
-    final weatherResponse = await fetchWeather(cityName);
+    final weatherResponse = await fetchWeather(cityName).timeout(
+      const Duration(seconds: 10),
+    );
     if (weatherResponse != null) {
+      weatherList.clear();
       weatherList.add(weatherResponse);
       imgURL.value = 'http:${weatherResponse.current.condition.icon}';
+      weatherLocation.value = "${weatherResponse.location.name}, ${weatherResponse.location.country}";
       return true;
     }
     return false;

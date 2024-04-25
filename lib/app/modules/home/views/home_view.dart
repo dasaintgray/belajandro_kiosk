@@ -1,10 +1,10 @@
 import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
-import 'package:belajandro_kiosk/services/utils/font_utils.dart';
-import 'package:belajandro_kiosk/widgets/button_widget.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
+import 'package:belajandro_kiosk/widgets/title_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 import 'package:get/get.dart';
@@ -40,37 +40,50 @@ class HomeView extends GetView<HomeController> {
                 WeatherAndClock(
                   orientation: orientation,
                 ),
-                SizedBox(
-                  height: 10.h,
-                  width: double.infinity,
-                  child: Center(
-                    child: Text(
-                      'SELECT LANGUAGE',
-                      style: TextStyle(
-                        color: HenryColors.lightGold,
-                        fontSize: 20.sp,
-                        fontFamily: oldAlpha,
-                      ),
-                    ),
-                  ),
+                TitleHeader(
+                  title: 'SELECT LANGUAGE',
+                  fontSize: 20.sp,
+                  color: HenryColors.lightGold,
                 ),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 40.sp, vertical: 20.sp),
                     child: ListView.builder(
                       itemCount: sc.languagesList.first.data.languages.length,
-                      padding: const EdgeInsets.all(15),
+                      // padding: const EdgeInsets.all(15),
                       itemBuilder: (context, index) {
-                        return ContainerButton(
-                          image: Image.asset(
-                            'assets/flags/${sc.languagesList.first.data.languages[index].flag}',
-                            fit: BoxFit.contain,
+                        return Card(
+                          color: HenryColors.lightGold,
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          margin: const EdgeInsets.all(20),
+                          child: InkWell(
+                            splashColor: HenryColors.itim.withAlpha(50),
+                            onTap: () {
+                              hc.languageID.value = sc.languagesList.first.data.languages[index].id;
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20),
+                                  child: Text(
+                                    sc.languagesList.first.data.languages[index].description,
+                                    style: TextStyle(color: HenryColors.puti, fontSize: 20.sp),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 20),
+                                  child: Image.asset(
+                                    'assets/flags/${sc.languagesList.first.data.languages[index].flag}',
+                                    fit: BoxFit.contain,
+                                    height: 7.h,
+                                    width: 8.w,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Text(
-                            sc.languagesList.first.data.languages[index].description,
-                            style: TextStyle(color: HenryColors.puti, fontSize: 12.sp),
-                          ),
-                        );
+                        ).animate().fadeIn(duration: 600.ms).then(delay: 300.ms).slide();
                       },
                     ),
                   ),
