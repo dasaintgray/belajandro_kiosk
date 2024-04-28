@@ -7,12 +7,16 @@ class ClockSkin extends StatelessWidget {
   final String minuteText;
   final String location;
   final String? fontName;
+  final double? height;
+  final double? width;
 
   const ClockSkin({
     super.key,
     required this.hourText,
     required this.minuteText,
     required this.location,
+    this.height,
+    this.width,
     this.fontName,
   });
 
@@ -24,10 +28,11 @@ class ClockSkin extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.zero),
       ),
       child: SizedBox(
-        width: 200,
-        height: 150,
+        width: width,
+        height: height,
+        // color: HenryColors.green,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -37,36 +42,37 @@ class ClockSkin extends StatelessWidget {
                   transform: Matrix4.skewX(-0.2),
                   child: Container(
                     alignment: Alignment.center,
-                    width: 70,
-                    height: 70,
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
                     child: Text(
                       hourText,
                       textAlign: TextAlign.justify,
-                      style: const TextStyle(color: Colors.black, fontSize: 50, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-                Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.skewX(-0.1),
-                  child: Image.asset(
-                    'assets/img/dot.png',
-                    fit: BoxFit.cover,
-                    height: 18,
-                    width: 4,
-                  ),
-                ),
-                const SizedBox(
-                  width: 3,
-                ),
+                // Transform(
+                //   alignment: Alignment.center,
+                //   transform: Matrix4.skewX(-0.1),
+                //   child: Image.asset(
+                //     'assets/img/dot.png',
+                //     fit: BoxFit.cover,
+                //     height: 15,
+                //     width: 8,
+                //   ),
+                // ),
                 Transform(
                   alignment: Alignment.center,
                   transform: Matrix4.skewX(-0.2),
                   child: Container(
                     alignment: Alignment.center,
-                    width: 70,
-                    height: 70,
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
                     child: Text(
                       // intl.DateFormat('mm').format(datetime),
@@ -74,7 +80,7 @@ class ClockSkin extends StatelessWidget {
                       textAlign: TextAlign.justify,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 50,
+                        fontSize: 40,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

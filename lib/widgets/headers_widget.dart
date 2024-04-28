@@ -1,6 +1,7 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
 import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
+import 'package:belajandro_kiosk/services/utils/font_utils.dart';
 import 'package:belajandro_kiosk/widgets/clock_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,65 +21,96 @@ class WeatherAndClock extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         SizedBox(
-          height: orientation == Orientation.landscape ? 25.h : 18.h,
+          height: orientation == Orientation.landscape ? 15.h : 21.h,
           width: double.infinity,
-          // color: HenryColors.teal,
+          // color: HenryColors.blueAccent,
           child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // TIME AND DATE
                   Expanded(
                     flex: 1,
                     child: SizedBox(
-                      height: orientation == Orientation.landscape ? 12.h : 6.h,
+                      height: orientation == Orientation.landscape ? 13.h : 13.h,
                       width: 10.w,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            DateFormat.EEEE().format(sc.dtNow),
-                            style: TextStyle(color: HenryColors.puti, fontSize: 15.sp),
-                          ),
-                          Text(
-                            DateFormat.yMMMd().format(sc.dtNow),
-                            style: TextStyle(color: HenryColors.puti, fontSize: 14.sp),
-                          ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                          ),
-                          Obx(
-                            () => Text(
+                      // color: HenryColors.gold,
+                      child: Obx(
+                        () => Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              DateFormat.EEEE().format(DateTime.now()),
+                              style: TextStyle(color: HenryColors.puti, fontSize: 15.sp),
+                            ),
+                            Text(
+                              DateFormat.yMMMMd().format(DateTime.now()),
+                              style: TextStyle(color: HenryColors.puti, fontSize: 14.sp),
+                            ),
+                            const Divider(
+                              height: 1,
+                              thickness: 1,
+                            ),
+                            Text(
                               sc.oras.value.toString(),
                               style: TextStyle(color: HenryColors.puti, fontSize: 11.sp),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // COMPANY LOGO
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      height: 13.h,
+                      width: 10.w,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: orientation == Orientation.landscape ? 20.h : 8.h,
+                            child: Image.asset(
+                              'assets/img/belajandro_256.png',
+                              fit: BoxFit.contain,
+                              height: 10.h,
+                            ),
+                          ),
+                          ListTile(
+                            titleAlignment: ListTileTitleAlignment.center,
+                            title: Text(
+                              sc.sCOMPANY.value,
+                              style: TextStyle(
+                                color: HenryColors.lightGold,
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: atteron,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            subtitle: Text(
+                              sc.sCompanyAddress.value,
+                              style: TextStyle(
+                                color: HenryColors.puti,
+                                fontSize: 10.sp,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      height: 6.h,
-                      width: 10.w,
-                      child: SizedBox(
-                        height: orientation == Orientation.landscape ? 20.h : 8.h,
-                        child: Image.asset(
-                          'assets/img/belajandro_256.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // WEATHER
                   Expanded(
                     flex: 1,
                     child: SizedBox(
-                      height: orientation == Orientation.landscape ? 12.h : 6.h,
+                      height: orientation == Orientation.landscape ? 12.h : 13.h,
                       width: 5.w,
+                      // color: HenryColors.gold,
                       child: Obx(
                         () => Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -166,36 +198,47 @@ class WeatherAndClock extends StatelessWidget {
                   ),
                 ],
               ),
+              // SPACE
               SizedBox(
-                height: orientation == Orientation.landscape ? 2.h : 3.h,
+                height: orientation == Orientation.landscape ? 2.h : 2.h,
                 width: double.infinity,
               ),
+              // WORLD TIME
               SizedBox(
-                height: orientation == Orientation.landscape ? 10.h : 5.h,
+                height: orientation == Orientation.landscape ? 10.h : 6.h,
                 width: double.infinity,
+                // color: HenryColors.gold,
                 child: Obx(
                   () => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ClockSkin(
                         location: 'TOKYO, JAPAN',
                         hourText: sc.tokyo.value.substring(0, 2),
                         minuteText: sc.tokyo.value.substring(3, 5),
+                        height: 35.h,
+                        // width: 20.w,
                       ),
                       ClockSkin(
                         location: 'SYDNEY, AUSTRALIA',
                         hourText: sc.sydney.value.substring(0, 2),
                         minuteText: sc.sydney.value.substring(3, 5),
+                        // height: 40.h,
+                        // width: 20.w,
                       ),
                       ClockSkin(
                         location: 'NEW YORK, USA',
                         hourText: sc.newYork.value.substring(0, 2),
                         minuteText: sc.newYork.value.substring(3, 5),
+                        // height: 40.h,
+                        // width: 20.w,
                       ),
                       ClockSkin(
                         location: 'RIYADH, KSA',
                         hourText: sc.riyadh.value.substring(0, 2),
                         minuteText: sc.riyadh.value.substring(3, 5),
+                        // height: 45.h,
+                        // width: 20.w,
                       ),
                     ],
                   ),

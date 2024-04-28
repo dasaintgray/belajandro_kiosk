@@ -21,7 +21,16 @@ class ScreenView extends GetView<ScreenController> {
         return Scaffold(
           body: GestureDetector(
             onTap: () {
-              Get.to(() => HomeView());
+              if (!sc.isLoading.value) {
+                Get.to(() => HomeView());
+              } else {
+                Get.snackbar(
+                  'Info',
+                  'Please wait to fetch the weather..',
+                  snackPosition: SnackPosition.BOTTOM,
+                  colorText: HenryColors.puti,
+                );
+              }
             },
             child: Container(
               // height: 100.h,
@@ -72,7 +81,7 @@ class ScreenView extends GetView<ScreenController> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        // const CircularProgressIndicator.adaptive(),
+                                        const CircularProgressIndicator.adaptive(),
                                         Text(
                                           'Fetching Weather...',
                                           style: TextStyle(
@@ -151,14 +160,14 @@ class ScreenView extends GetView<ScreenController> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                DateFormat.EEEE().format(sc.dtNow),
+                                DateFormat.EEEE().format(DateTime.now()),
                                 style: TextStyle(
                                   color: HenryColors.puti,
                                   fontSize: 15.sp,
                                 ),
                               ),
                               Text(
-                                DateFormat.yMMMMd().format(sc.dtNow),
+                                DateFormat.yMMMMd().format(DateTime.now()),
                                 style: TextStyle(
                                   color: HenryColors.puti,
                                   fontSize: 12.sp,

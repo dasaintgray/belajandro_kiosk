@@ -20,7 +20,7 @@ class TitleHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isWala = fontFamily?.isEmpty ?? true;
     return SizedBox(
-      height: 10.h,
+      height: 8.h,
       width: double.infinity,
       child: Center(
         child: Text(

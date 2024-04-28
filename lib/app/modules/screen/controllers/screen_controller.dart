@@ -2,8 +2,10 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:belajandro_kiosk/app/data/graphql_model/languages_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/settings_and_translation_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/settings_model.dart';
 import 'package:belajandro_kiosk/app/data/rest_model/weather_model.dart';
 import 'package:belajandro_kiosk/services/base/base_client_service.dart';
@@ -19,6 +21,7 @@ import 'package:get/get.dart';
 class ScreenController extends GetxController with BaseController {
   final settingsList = <SettingsModel>[];
   final languagesList = <LanguagesModel>[];
+  final satList = <SettingsAndTranslationModel>[];
 
   final weatherList = <WeatherModel>[].obs;
 
@@ -30,6 +33,8 @@ class ScreenController extends GetxController with BaseController {
   final weatherLocation = ''.obs;
   final oras = ''.obs;
   final sCITY = ''.obs;
+  final sCOMPANY = ''.obs;
+  final sCompanyAddress = ''.obs;
 
   final tokyo = ''.obs;
   final sydney = ''.obs;
@@ -39,9 +44,11 @@ class ScreenController extends GetxController with BaseController {
   // integer
   final tempC = 0.obs;
 
+  // LIST
+  final List cities = ['Angeles City', 'Tokyo', 'Sydney', 'New York', 'Riyadh', 'Quezon City'];
+
   // date
-  final dtNow = DateTime.now();
-  final rxDTNOW = DateTime.now().obs;
+  final dtNow = DateTime.now().obs;
   final dtFormatter = DateFormat();
 
   @override
@@ -79,15 +86,41 @@ class ScreenController extends GetxController with BaseController {
 
       final indexKey = settingsList.first.data.settings.indexWhere((element) => element.code == 'CITY');
       sCITY.value = settingsList.first.data.settings[indexKey].value;
+      //   // COMPANY NAME AND ADDRESS
+      final r1Result = settingsList.first.data.settings.indexWhere((element) => element.code == 'R1');
+      final r2Result = settingsList.first.data.settings.indexWhere((element) => element.code == 'R2');
+      sCOMPANY.value = settingsList.first.data.settings[r1Result].value;
+      sCompanyAddress.value = settingsList.first.data.settings[r2Result].value;
 
       final response = await getWeather(sCITY.value);
       if (response) {
         isLoading.value = false;
-        autoFetchWeather(
-          duration: const Duration(minutes: 1),
-        );
+        autoFetchWeather(duration: 10.minutes);
       }
     }
+
+    // final satResponse = await getSAT(
+    //     accessHeader: GlobalConstant.globalHeader,
+    //     gqlURL: GlobalConstant.gqlURL,
+    //     documents: GQLData.settingsAndTranslation);
+    // if (satResponse != null) {
+    //   satList.add(satResponse);
+
+    //   final indexKey = satList.first.data.settings.indexWhere((element) => element.code == 'CITY');
+    //   sCITY.value = satList.first.data.settings[indexKey].value;
+
+    //   // COMPANY NAME AND ADDRESS
+    //   final r1Result = satList.first.data.settings.indexWhere((element) => element.code == 'R1');
+    //   final r2Result = satList.first.data.settings.indexWhere((element) => element.code == 'R2');
+    //   sCOMPANY.value = satList.first.data.settings[r1Result].value;
+    //   sCompanyAddress.value = satList.first.data.settings[r2Result].value;
+
+    //   final weatherResponse = await getWeather(sCITY.value); //first intial city
+    //   if (weatherResponse) {
+    //     isLoading.value = false;
+    //     autoFetchWeather(duration: 10.minutes);
+    //   }
+    // }
   }
 
   @override
@@ -102,6 +135,8 @@ class ScreenController extends GetxController with BaseController {
     if (languageResponse != null) {
       languagesList.add(languageResponse);
     }
+
+    // INITIALIZE THE LIST
   }
 
   @override
@@ -110,39 +145,49 @@ class ScreenController extends GetxController with BaseController {
   }
 
   void startTime() {
-    DateTime baseTime = DateTime(dtNow.year, dtNow.month, dtNow.day, dtNow.hour, dtNow.minute, dtNow.second);
+    DateTime baseTime = DateTime(
+        dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour, dtNow.value.minute, dtNow.value.second);
 
-    DateTime japanTime = DateTime(dtNow.year, dtNow.month, dtNow.day, dtNow.hour - 1, dtNow.minute, dtNow.second);
-    DateTime sydneyTime = DateTime(dtNow.year, dtNow.month, dtNow.day, dtNow.hour - 2, dtNow.minute, dtNow.second);
-    DateTime newYorkTime = DateTime(dtNow.year, dtNow.month, dtNow.day, dtNow.hour + 12, dtNow.minute, dtNow.second);
-    DateTime riyadhTime = DateTime(dtNow.year, dtNow.month, dtNow.day, dtNow.hour + 5, dtNow.minute, dtNow.second);
+    DateTime japanTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour - 1,
+        dtNow.value.minute, dtNow.value.second);
+    DateTime sydneyTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour - 2,
+        dtNow.value.minute, dtNow.value.second);
+    DateTime newYorkTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour + 12,
+        dtNow.value.minute, dtNow.value.second);
+    DateTime riyadhTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour + 5,
+        dtNow.value.minute, dtNow.value.second);
 
     Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
         Duration difference = DateTime.now().difference(baseTime);
-        oras.value = DateFormat("hh:mm:ss a").format(dtNow.add(difference));
+        // Duration difference = dtNow.value.difference(baseTime);
+        oras.value = DateFormat("hh:mm:ss a").format(dtNow.value.add(difference));
 
         Duration japanDifference = DateTime.now().difference(japanTime);
         // tokyo.value = DateFormat("Hh:mm").format(dtNow.add(japanDifference));
-        tokyo.value = DateFormat.Hm().format(dtNow.add(japanDifference));
+        tokyo.value = DateFormat.Hm().format(dtNow.value.add(japanDifference));
 
         Duration sydneyDifference = DateTime.now().difference(sydneyTime);
-        sydney.value = DateFormat.Hm().format(dtNow.add(sydneyDifference));
+        sydney.value = DateFormat.Hm().format(dtNow.value.add(sydneyDifference));
 
         Duration newyorkDifference = DateTime.now().difference(newYorkTime);
-        newYork.value = DateFormat.Hm().format(dtNow.add(newyorkDifference));
+        newYork.value = DateFormat.Hm().format(dtNow.value.add(newyorkDifference));
 
         Duration riyadDifference = DateTime.now().difference(riyadhTime);
-        riyadh.value = DateFormat.Hm().format(dtNow.add(riyadDifference));
+        riyadh.value = DateFormat.Hm().format(dtNow.value.add(riyadDifference));
       },
     );
   }
 
   void autoFetchWeather({required Duration duration}) {
     Timer.periodic(duration, (timer) async {
-      await getWeather('New York');
+      await getWeather(getRandomCity());
     });
+  }
+
+  String getRandomCity() {
+    return cities[Random().nextInt(cities.length)];
   }
 
   Future<bool> getWeather(String? cityName) async {
@@ -180,6 +225,26 @@ class ScreenController extends GetxController with BaseController {
       return null;
     } finally {
       isLoading.value = true;
+    }
+  }
+
+  /// SETTINGS AND TRANSLATION
+  /// DESCRIPTION: PINAG MIX KO NA LANG YUNG SETTINGS AND TRANSLATION TABLE PARA
+  /// MABILIS ANG PAG QUERY
+  /// AUTHOR: HENRY V. MEMPIN
+  Future<SettingsAndTranslationModel?> getSAT(
+      {required Map<String, String> accessHeader,
+      required String? gqlURL,
+      required String? documents,
+      Map<String, dynamic>? docVar}) async {
+    final response = await ServiceProvider.gQLQuery(graphQLURL: gqlURL, documents: documents, headers: accessHeader);
+    final List res1 = response['data']['Settings'];
+    final List res2 = response['data']['Translations'];
+
+    if (res1.isNotEmpty && res2.isNotEmpty) {
+      return settingsAndTranslationModelFromJson(jsonEncode(response));
+    } else {
+      return null;
     }
   }
 

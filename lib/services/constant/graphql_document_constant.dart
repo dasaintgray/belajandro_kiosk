@@ -12,6 +12,46 @@ class GQLData {
 }
 ''';
 
+  static String settingsAndTranslation = r'''
+  query @cached {
+    Settings(order_by: {Id: asc}) {
+      code
+      value
+      description
+    }
+    Translations {
+      Id
+      LanguageId
+      code
+      description
+      translationText
+      images
+      type
+    }
+  }
+  ''';
+
+  static String qryTranslation = r'''query getTranslation {
+    menu: Translations {
+      Id
+      LanguageId
+      code
+      description
+      translationText
+      images
+      type
+    }
+  }''';
+
+  static String qryPaymentTypes = r'''query getPaymentType {
+  PaymentTypes(where: {isActive: {_eq: true}}) {
+    Id
+    code
+    description
+  }
+}
+''';
+
   static String qryAvailableRooms = r'''
     query getRoomAvailable($agentID: Int!, $accommodationTypeID: Int!, $roomTypeID: Int!, $bed: Int!) {
       vRoomAvailable(where: {AgentId: {_eq: $agentID}, 

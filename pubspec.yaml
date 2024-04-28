@@ -18,6 +18,7 @@ dependencies:
   #COMMUNICATION
   hasura_connect: ^5.0.0+3
   http: ^1.2.1
+  translator: ^1.0.0
 
   #RESPONSIVE 
   responsive_sizer: ^3.2.0
@@ -27,6 +28,7 @@ dependencies:
 
   #VISUAL
   flutter_animate: ^4.5.0
+  virtual_keyboard_custom_layout: ^1.0.0
 
 dev_dependencies: 
   flutter_lints: ^3.0.0
