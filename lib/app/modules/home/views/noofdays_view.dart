@@ -1,23 +1,21 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
-import 'package:belajandro_kiosk/app/modules/home/views/ciprocess_view.dart';
 import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/font_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
-import 'package:belajandro_kiosk/widgets/menu_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 import 'package:get/get.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-class TransactionView extends GetView {
-  // call the controller
+class NoofdaysView extends GetView {
   final hc = Get.find<HomeController>();
   final sc = Get.find<ScreenController>();
 
-  TransactionView({super.key});
+  NoofdaysView({super.key});
   @override
   Widget build(BuildContext context) {
     return rs.ResponsiveSizer(
@@ -39,37 +37,66 @@ class TransactionView extends GetView {
                   orientation: orientation,
                 ),
                 TitleHeader(
-                  title: hc.titleList.first.translationText,
+                  title: 'SELECT NUMBER OF DAYS',
                   fontSize: 20.sp,
                   color: HenryColors.lightGold,
                   fontFamily: atteron,
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: hc.pageList.length,
-                    padding: EdgeInsets.only(left: 35.sp, right: 35.sp, top: 10.sp, bottom: 10.sp),
-                    itemBuilder: (buildContext, index) {
-                      return MenuWidget(
-                        titleName: hc.pageList[index].translationText,
-                        imageName: 'assets/icons/${hc.pageList[index].images}',
-                        cardColor: HenryColors.teal,
-                        shadowColor: HenryColors.teal.withOpacity(0.5),
-                        onTap: () {
-                          hc.languageID.value = hc.pageList[index].languageId;
-                          switch (index) {
-                            case 0:
-                              final result = hc.makeMenu(languageID: hc.languageID.value, code: 'SCIP');
-                              result
-                                  ? Get.to(() => CiprocessView())
-                                  : Get.defaultDialog(title: 'Future', middleText: 'To be follow');
-                              break;
-                            default:
-                              Get.defaultDialog(title: 'Future', middleText: 'To be follow');
-                              break;
-                          }
-                        },
-                      );
-                    },
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 40.h,
+                        width: 70.w,
+                        child: SfDateRangePicker(
+                          onSelectionChanged: hc.onSelectionChanged,
+                          headerHeight: 5.h,
+                          selectionMode: DateRangePickerSelectionMode.range,
+                          initialSelectedRange: PickerDateRange(sc.dtNow.value, sc.dtNow.value.add(3.days)),
+                          enablePastDates: false,
+                          headerStyle: DateRangePickerHeaderStyle(
+                            textStyle: TextStyle(
+                              color: HenryColors.lightGold,
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: bernardMT,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Obx(
+                        () => ListTile(
+                          leading: Text(
+                            'Range Count: ${hc.rangeCount.value}',
+                            style: TextStyle(
+                              color: HenryColors.puti,
+                            ),
+                          ),
+                          title: Center(
+                            child: Text(
+                              'Range Value: ${hc.range.value}',
+                              style: TextStyle(
+                                color: HenryColors.puti,
+                              ),
+                            ),
+                          ),
+                          subtitle: Center(
+                            child: Text(
+                              'Selected: ${hc.selectedDate.value}',
+                              style: TextStyle(
+                                color: HenryColors.puti,
+                              ),
+                            ),
+                          ),
+                          trailing: Text(
+                            'Date Count: ${hc.dateCount.value}',
+                            style: TextStyle(
+                              color: HenryColors.puti,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // BACK IMAGE

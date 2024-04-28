@@ -8,6 +8,8 @@ import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/providers/service_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:translator/translator.dart' as tagasalin;
 
 class HomeController extends GetxController {
@@ -22,6 +24,10 @@ class HomeController extends GetxController {
   // STRING
   final pageTitle = ''.obs;
   final languageCode = ''.obs;
+  final range = ''.obs;
+  final selectedDate = ''.obs;
+  final dateCount = '0'.obs;
+  final rangeCount = '0'.obs;
 
   // translator
   final palitan = tagasalin.GoogleTranslator();
@@ -46,14 +52,18 @@ class HomeController extends GetxController {
     return (context.width, context.height);
   }
 
-  // bool generateMenu({required Translation itemList, required String? code, required String? type, required int? languageID}) {
-  //   menuList.clear();
-  //   menuList.addAll(itemList);
-
-  //   if () {
-
-  //   }
-  // }
+  void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    if (args.value is PickerDateRange) {
+      range.value = '${DateFormat('MMM/dd/yyyy').format(args.value.startDate)} -'
+          ' ${DateFormat('MMM/dd/yyyy').format(args.value.endDate ?? args.value.startDate)}';
+    } else if (args.value is DateTime) {
+      selectedDate.value = args.value.toString();
+    } else if (args.value is List<DateTime>) {
+      dateCount.value = args.value.length.toString();
+    } else {
+      rangeCount.value = args.value.length.toString();
+    }
+  }
 
   Future<bool?> fetchMenu({required int? langID}) async {
     final response = await getMenuInformation(

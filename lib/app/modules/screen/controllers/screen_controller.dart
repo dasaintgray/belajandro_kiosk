@@ -45,7 +45,16 @@ class ScreenController extends GetxController with BaseController {
   final tempC = 0.obs;
 
   // LIST
-  final List cities = ['Angeles City', 'Tokyo', 'Sydney', 'New York', 'Riyadh', 'Quezon City'];
+  final List cities = [
+    'Angeles City',
+    'Quezon City',
+    'Baguio City',
+    'Tagaytay City',
+    'Tokyo',
+    'Sydney',
+    'New York',
+    'Riyadh',
+  ];
 
   // date
   final dtNow = DateTime.now().obs;
