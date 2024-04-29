@@ -35,6 +35,7 @@ class PaymentTypeView extends GetView {
               children: [
                 WeatherAndClock(
                   orientation: orientation,
+                  screenType: screenType,
                 ),
                 TitleHeader(
                   title: titulo,

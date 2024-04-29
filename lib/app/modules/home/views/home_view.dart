@@ -41,6 +41,7 @@ class HomeView extends GetView<HomeController> {
               children: [
                 WeatherAndClock(
                   orientation: orientation,
+                  screenType: screenType,
                 ),
                 TitleHeader(
                   title: 'SELECT LANGUAGE',

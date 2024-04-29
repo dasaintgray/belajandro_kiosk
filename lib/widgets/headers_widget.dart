@@ -7,11 +7,12 @@ import 'package:belajandro_kiosk/widgets/clock_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 class WeatherAndClock extends StatelessWidget {
   final Orientation orientation;
-  WeatherAndClock({super.key, required this.orientation});
+  final rs.ScreenType screenType;
+  WeatherAndClock({super.key, required this.orientation, required this.screenType});
 
   final hc = Get.find<HomeController>();
   final sc = Get.find<ScreenController>();
@@ -22,7 +23,7 @@ class WeatherAndClock extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         SizedBox(
-          height: orientation == Orientation.landscape ? 15.h : 21.h,
+          height: orientation == Orientation.landscape ? 15.h : 22.h,
           width: double.infinity,
           // color: HenryColors.blueAccent,
           child: Column(

@@ -34,68 +34,74 @@ class ClockSkin extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Transform(
-                  transform: Matrix4.skewX(-0.2),
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
-                    child: Text(
-                      hourText,
-                      textAlign: TextAlign.justify,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 50,
-                        fontWeight: FontWeight.bold,
+            Expanded(
+              flex: 6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Transform(
+                    transform: Matrix4.skewX(-0.2),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
+                      child: Text(
+                        hourText,
+                        textAlign: TextAlign.justify,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                // Transform(
-                //   alignment: Alignment.center,
-                //   transform: Matrix4.skewX(-0.1),
-                //   child: Image.asset(
-                //     'assets/img/dot.png',
-                //     fit: BoxFit.cover,
-                //     height: 15,
-                //     width: 8,
-                //   ),
-                // ),
-                Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.skewX(-0.2),
-                  child: Container(
+                  // Transform(
+                  //   alignment: Alignment.center,
+                  //   transform: Matrix4.skewX(-0.1),
+                  //   child: Image.asset(
+                  //     'assets/img/dot.png',
+                  //     fit: BoxFit.cover,
+                  //     height: 15,
+                  //     width: 8,
+                  //   ),
+                  // ),
+                  Transform(
                     alignment: Alignment.center,
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
-                    child: Text(
-                      // intl.DateFormat('mm').format(datetime),
-                      minuteText,
-                      textAlign: TextAlign.justify,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 50,
-                        fontWeight: FontWeight.bold,
+                    transform: Matrix4.skewX(-0.2),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
+                      child: Text(
+                        // intl.DateFormat('mm').format(datetime),
+                        minuteText,
+                        textAlign: TextAlign.justify,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            SizedBox(
-              child: Text(
-                location,
-                style: TextStyle(
-                  color: HenryColors.puti,
-                  fontSize: 10.sp,
+            Expanded(
+              flex: 1,
+              child: SizedBox(
+                child: Text(
+                  location,
+                  style: TextStyle(
+                    color: HenryColors.puti,
+                    fontSize: 10.sp,
+                  ),
+                  textAlign: TextAlign.start,
                 ),
-                textAlign: TextAlign.start,
               ),
             ),
           ],

@@ -37,6 +37,7 @@ class CiprocessView extends GetView {
               children: [
                 WeatherAndClock(
                   orientation: orientation,
+                  screenType: screenType,
                 ),
                 TitleHeader(
                   title: hc.titleList.first.translationText,

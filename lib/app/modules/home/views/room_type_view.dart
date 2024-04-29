@@ -37,6 +37,7 @@ class RoomTypeView extends GetView {
               children: [
                 WeatherAndClock(
                   orientation: orientation,
+                  screenType: screenType,
                 ),
                 TitleHeader(
                   title: titulo,
