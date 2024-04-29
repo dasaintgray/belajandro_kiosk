@@ -52,6 +52,16 @@ class GQLData {
 }
 ''';
 
+  static String qryRoomType = r'''query getRoomTypes {
+  vRoomTypes(where: {isActive: {_eq: true}}) {
+    Id
+    code
+    LocationId
+    description
+  }
+}
+''';
+
   static String qryAvailableRooms = r'''
     query getRoomAvailable($agentID: Int!, $accommodationTypeID: Int!, $roomTypeID: Int!, $bed: Int!) {
       vRoomAvailable(where: {AgentId: {_eq: $agentID}, 

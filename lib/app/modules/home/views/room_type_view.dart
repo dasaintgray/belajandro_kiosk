@@ -1,5 +1,5 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
-import 'package:belajandro_kiosk/app/modules/home/views/room_type_view.dart';
+import 'package:belajandro_kiosk/app/modules/home/views/noofdays_view.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/font_utils.dart';
@@ -12,12 +12,10 @@ import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 import 'package:get/get.dart';
 
-class CiprocessView extends GetView {
-  // call the controller
+class RoomTypeView extends GetView {
   final hc = Get.find<HomeController>();
-
-  CiprocessView({super.key});
-
+  final String titulo;
+  RoomTypeView({super.key, required this.titulo});
   @override
   Widget build(BuildContext context) {
     return rs.ResponsiveSizer(
@@ -34,12 +32,14 @@ class CiprocessView extends GetView {
             ),
             padding: EdgeInsets.all(12.sp),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 WeatherAndClock(
                   orientation: orientation,
                 ),
                 TitleHeader(
-                  title: hc.titleList.first.translationText,
+                  title: titulo,
                   fontSize: 20.sp,
                   color: HenryColors.lightGold,
                   fontFamily: atteron,
@@ -47,48 +47,36 @@ class CiprocessView extends GetView {
                 Expanded(
                   child: Obx(
                     () => Container(
-                      padding: EdgeInsets.symmetric(horizontal: 35.sp, vertical: 20.sp),
+                      padding: EdgeInsets.only(left: 35.sp, right: 35.sp, top: 10.sp, bottom: 10.sp),
                       child: hc.isLoading.value
                           ? LoadingWidget(
                               lottieFiles: hc.generateLotties(),
                             )
                           : ListView.builder(
-                              itemCount: hc.pageList.length,
+                              itemCount: hc.roomTypeList.length,
                               itemBuilder: (context, index) {
                                 return MenuWidget(
-                                  titleName: hc.pageList[index].translationText,
-                                  imageName: 'assets/icons/${hc.pageList[index].images}',
+                                  titleName: hc.roomTypeList[index].description,
+                                  imageName: ImageConstant.belajandroICON,
                                   cardColor: HenryColors.teal,
                                   shadowColor: HenryColors.teal.withOpacity(0.5),
                                   onTap: () async {
-                                    switch (index) {
-                                      case 0: //booked room
-                                        Get.defaultDialog(
-                                          title: 'Info',
-                                          middleText: 'To be follow',
-                                        );
-                                        break;
-                                      case 1: //walkin
-                                        hc.isLoading.value = true;
-                                        final response = await hc.fetchRoomTypes(langCode: hc.languageCode.value);
-                                        if (hc.languageID.value != 1) {
-                                          hc.pageTitle.value = (await hc.iTranslate(
-                                              languageCode: hc.languageCode.value, sourceText: 'SELECT ROOM TYPE'))!;
-                                          hc.isLoading.value = false;
-                                        } else {
-                                          hc.isLoading.value = false;
-                                          hc.pageTitle.value = 'SELECT ROOM TYPE';
-                                        }
-                                        if (response!) {
-                                          Get.to(
-                                            () => RoomTypeView(
-                                              titulo: hc.pageTitle.value,
-                                            ),
-                                          );
-                                        }
-                                        break;
-                                      default:
+                                    hc.isLoading.value = true;
+                                    hc.selectedRoomType.value = hc.roomTypeList[index].id;
+                                    if (hc.languageID.value != 1) {
+                                      hc.pageTitle.value = (await hc.iTranslate(
+                                          languageCode: hc.languageCode.value, sourceText: 'SELECT NUMBER OF DAYS'))!;
+                                      hc.isLoading.value = false;
+                                    } else {
+                                      hc.isLoading.value = false;
+                                      hc.pageTitle.value = 'SELECT NUMBER OF DAYS';
                                     }
+
+                                    Get.to(
+                                      () => NoofdaysView(
+                                        tituto: hc.pageTitle.value,
+                                      ),
+                                    );
                                   },
                                 );
                               },
@@ -101,8 +89,7 @@ class CiprocessView extends GetView {
                   width: double.infinity,
                   child: InkWell(
                     onTap: () {
-                      final result = hc.makeMenu(languageID: hc.languageID.value, code: 'ST');
-                      result ? Get.back() : Get.snackbar('Error', 'Unable to get back');
+                      Get.back();
                     },
                     child: Image.asset(
                       ImageConstant.backArrow,
@@ -112,9 +99,8 @@ class CiprocessView extends GetView {
                     ),
                   ),
                 ),
-                // SPACE
                 SizedBox(
-                  height: 2.h,
+                  height: 3.h,
                   width: double.infinity,
                 ),
                 SizedBox(

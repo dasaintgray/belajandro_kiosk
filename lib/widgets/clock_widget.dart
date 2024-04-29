@@ -42,15 +42,15 @@ class ClockSkin extends StatelessWidget {
                   transform: Matrix4.skewX(-0.2),
                   child: Container(
                     alignment: Alignment.center,
-                    width: 60,
-                    height: 60,
+                    width: 80,
+                    height: 80,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
                     child: Text(
                       hourText,
                       textAlign: TextAlign.justify,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 40,
+                        fontSize: 50,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -71,8 +71,8 @@ class ClockSkin extends StatelessWidget {
                   transform: Matrix4.skewX(-0.2),
                   child: Container(
                     alignment: Alignment.center,
-                    width: 60,
-                    height: 60,
+                    width: 80,
+                    height: 80,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(12.0), color: Colors.white),
                     child: Text(
                       // intl.DateFormat('mm').format(datetime),
@@ -80,7 +80,7 @@ class ClockSkin extends StatelessWidget {
                       textAlign: TextAlign.justify,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 40,
+                        fontSize: 50,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

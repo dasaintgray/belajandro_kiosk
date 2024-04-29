@@ -1,5 +1,5 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
-import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
+import 'package:belajandro_kiosk/app/modules/home/views/payment_type_view.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/font_utils.dart';
@@ -13,9 +13,8 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class NoofdaysView extends GetView {
   final hc = Get.find<HomeController>();
-  final sc = Get.find<ScreenController>();
-
-  NoofdaysView({super.key});
+  final String tituto;
+  NoofdaysView({super.key, required this.tituto});
   @override
   Widget build(BuildContext context) {
     return rs.ResponsiveSizer(
@@ -37,7 +36,7 @@ class NoofdaysView extends GetView {
                   orientation: orientation,
                 ),
                 TitleHeader(
-                  title: 'SELECT NUMBER OF DAYS',
+                  title: tituto,
                   fontSize: 20.sp,
                   color: HenryColors.lightGold,
                   fontFamily: atteron,
@@ -47,13 +46,21 @@ class NoofdaysView extends GetView {
                     children: [
                       SizedBox(
                         height: 40.h,
-                        width: 70.w,
+                        width: 90.w,
                         child: SfDateRangePicker(
                           onSelectionChanged: hc.onSelectionChanged,
+                          enableMultiView: true,
                           headerHeight: 5.h,
                           selectionMode: DateRangePickerSelectionMode.range,
-                          initialSelectedRange: PickerDateRange(sc.dtNow.value, sc.dtNow.value.add(3.days)),
+                          // initialSelectedRange: PickerDateRange(sc.dtNow.value, sc.dtNow.value.add(2.days)),
                           enablePastDates: false,
+                          showTodayButton: true,
+                          selectionColor: HenryColors.teal,
+                          startRangeSelectionColor: HenryColors.lightGold,
+                          endRangeSelectionColor: HenryColors.lightGold,
+                          rangeSelectionColor: HenryColors.lightGold.withOpacity(0.3),
+                          selectionTextStyle: TextStyle(fontSize: 15.sp, fontFamily: bernardMT),
+                          rangeTextStyle: TextStyle(fontSize: 15.sp, fontFamily: bernardMT),
                           headerStyle: DateRangePickerHeaderStyle(
                             textStyle: TextStyle(
                               color: HenryColors.lightGold,
@@ -62,36 +69,80 @@ class NoofdaysView extends GetView {
                               fontFamily: bernardMT,
                             ),
                           ),
+                          monthViewSettings: DateRangePickerMonthViewSettings(
+                            dayFormat: 'EEE',
+                            viewHeaderHeight: 60,
+                            weekendDays: const [7],
+                            viewHeaderStyle: DateRangePickerViewHeaderStyle(
+                              textStyle: TextStyle(fontSize: 15.sp, fontFamily: bernardMT),
+                            ),
+                            // weekNumberStyle: DateRangePickerWeekNumberStyle(
+                            //   textStyle: TextStyle(
+                            //     fontFamily: bernardMT,
+                            //     fontSize: 15.sp,
+                            //   ),
+                            // ),
+                          ),
+                          monthCellStyle: DateRangePickerMonthCellStyle(
+                            weekendTextStyle:
+                                TextStyle(color: HenryColors.blueAccent, fontFamily: bernardMT, fontSize: 15.sp),
+                            specialDatesTextStyle:
+                                TextStyle(color: HenryColors.pula, fontFamily: bernardMT, fontSize: 15.sp),
+                            textStyle: TextStyle(fontSize: 15.sp, color: HenryColors.itim, fontFamily: bernardMT),
+                            todayTextStyle: TextStyle(
+                              fontSize: 15.sp,
+                              fontFamily: bernardMT,
+                              color: HenryColors.gold,
+                            ),
+                            leadingDatesDecoration: BoxDecoration(
+                                color: const Color(0xFFDFDFDF),
+                                border: Border.all(color: const Color(0xFFB6B6B6), width: 1),
+                                shape: BoxShape.circle),
+                          ),
                         ),
                       ),
-                      Obx(
-                        () => ListTile(
-                          leading: Text(
-                            'Range Count: ${hc.rangeCount.value}',
-                            style: TextStyle(
-                              color: HenryColors.puti,
-                            ),
-                          ),
-                          title: Center(
-                            child: Text(
-                              'Range Value: ${hc.range.value}',
-                              style: TextStyle(
-                                color: HenryColors.puti,
-                              ),
-                            ),
-                          ),
-                          subtitle: Center(
-                            child: Text(
-                              'Selected: ${hc.selectedDate.value}',
-                              style: TextStyle(
-                                color: HenryColors.puti,
-                              ),
-                            ),
-                          ),
-                          trailing: Text(
-                            'Date Count: ${hc.dateCount.value}',
-                            style: TextStyle(
-                              color: HenryColors.puti,
+                      SizedBox(
+                        height: 5.h,
+                        width: double.infinity,
+                      ),
+                      SizedBox(
+                        height: 6.h,
+                        width: 35.w,
+                        child: Obx(
+                          () => Visibility(
+                            visible: hc.noofdays.value != 0,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                hc.isLoading.value = true;
+                                final translatedText = await hc.iTranslate(
+                                    languageCode: hc.languageCode.value, sourceText: 'SELECT PAYMENT TYPE');
+                                final response = await hc.fetchPayment(langCode: hc.languageCode.value);
+                                if (response!) {
+                                  hc.isLoading.value = false;
+                                  Get.to(
+                                    () => PaymentTypeView(
+                                      titulo: translatedText!,
+                                    ),
+                                  );
+                                }
+                              },
+                              autofocus: true,
+                              style: ElevatedButton.styleFrom(backgroundColor: HenryColors.teal),
+                              child: hc.isLoading.value
+                                  ? Text(
+                                      'Processing..',
+                                      style: TextStyle(color: HenryColors.puti, fontSize: 12.sp),
+                                    )
+                                  : Text(
+                                      hc.noofdays.value == 0
+                                          ? 'OK'
+                                          : 'Agree (${hc.noofdays.value} ${hc.noofdays.value >= 2 ? 'days' : 'day'})?',
+                                      style: TextStyle(
+                                        color: HenryColors.puti,
+                                        fontSize: 15.sp,
+                                        // fontFamily: bernardMT,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),

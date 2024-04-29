@@ -1,6 +1,4 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
-import 'package:belajandro_kiosk/app/modules/home/views/ciprocess_view.dart';
-import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/font_utils.dart';
@@ -12,12 +10,9 @@ import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 import 'package:get/get.dart';
 
-class TransactionView extends GetView {
-  // call the controller
+class InputBookingNumberView extends GetView {
   final hc = Get.find<HomeController>();
-  final sc = Get.find<ScreenController>();
-
-  TransactionView({super.key});
+  InputBookingNumberView({super.key});
   @override
   Widget build(BuildContext context) {
     return rs.ResponsiveSizer(
@@ -45,41 +40,52 @@ class TransactionView extends GetView {
                   fontFamily: atteron,
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: hc.pageList.length,
-                    padding: EdgeInsets.only(left: 35.sp, right: 35.sp, top: 10.sp, bottom: 10.sp),
-                    itemBuilder: (buildContext, index) {
-                      return MenuWidget(
-                        titleName: hc.pageList[index].translationText,
-                        imageName: 'assets/icons/${hc.pageList[index].images}',
-                        cardColor: HenryColors.teal,
-                        shadowColor: HenryColors.teal.withOpacity(0.5),
-                        onTap: () {
-                          hc.languageID.value = hc.pageList[index].languageId;
-                          switch (index) {
-                            case 0:
-                              final result = hc.makeMenu(languageID: hc.languageID.value, code: 'SCIP');
-                              if (result) {
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 35.sp, vertical: 20.sp),
+                    child: ListView.builder(
+                      itemCount: hc.pageList.length,
+                      itemBuilder: (context, index) {
+                        return MenuWidget(
+                          titleName: hc.pageList[index].translationText,
+                          imageName: 'assets/icons/${hc.pageList[index].images}',
+                          cardColor: HenryColors.teal,
+                          shadowColor: HenryColors.teal.withOpacity(0.5),
+                          onTap: () async {
+                            switch (index) {
+                              case 0: //booked room
+                                Get.defaultDialog(
+                                  title: 'Info',
+                                  middleText: 'To be follow',
+                                );
+                                break;
+                              case 1: //walkin
+                                hc.isLoading.value = true;
+                                final titleText = await hc.iTranslate(
+                                    languageCode: hc.languageCode.value, sourceText: 'SELECT NUMBER OF DAYS');
                                 hc.isLoading.value = false;
-                                Get.to(() => CiprocessView());
-                              }
-                              break;
-                            default:
-                              Get.defaultDialog(title: 'Future', middleText: 'To be follow');
-                              break;
-                          }
-                        },
-                      );
-                    },
+                                // if (titleText!.isNotEmpty) {
+                                //   Get.to(
+                                //     () => NoofdaysView(
+                                //       tituto: titleText,
+                                //     ),
+                                //   );
+                                // }
+                                break;
+                              default:
+                            }
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
-                // BACK IMAGE
                 SizedBox(
                   height: 5.h,
                   width: double.infinity,
                   child: InkWell(
                     onTap: () {
-                      Get.back();
+                      final result = hc.makeMenu(languageID: hc.languageID.value, code: 'ST');
+                      result ? Get.back() : Get.snackbar('Error', 'Unable to get back');
                     },
                     child: Image.asset(
                       ImageConstant.backArrow,
@@ -94,7 +100,6 @@ class TransactionView extends GetView {
                   height: 2.h,
                   width: double.infinity,
                 ),
-                // CM LOGO
                 SizedBox(
                   height: 4.h,
                   width: double.infinity,

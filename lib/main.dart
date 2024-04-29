@@ -1,6 +1,5 @@
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:get/get.dart';
 
@@ -15,8 +14,8 @@ void main() {
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
       debugShowCheckedModeBanner: false,
-      defaultTransition: Transition.circularReveal,
-      transitionDuration: 500.ms,
+      defaultTransition: Transition.leftToRightWithFade,
+      // transitionDuration: 300.ms,
       theme: ThemeData(
         primaryColor: HenryColors.teal,
         fontFamily: 'Product Sans',

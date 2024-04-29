@@ -1,8 +1,6 @@
-import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class MenuWidget extends StatelessWidget {
@@ -14,7 +12,7 @@ class MenuWidget extends StatelessWidget {
   // final int indexKey;
   final Function() onTap;
 
-  MenuWidget({
+  const MenuWidget({
     super.key,
     // required this.menuList,
     required this.titleName,
@@ -25,7 +23,7 @@ class MenuWidget extends StatelessWidget {
     required this.onTap,
   });
 
-  final hc = Get.find<HomeController>();
+  // final hc = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {

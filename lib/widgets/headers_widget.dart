@@ -1,6 +1,7 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
 import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
+import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/font_utils.dart';
 import 'package:belajandro_kiosk/widgets/clock_widget.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ class WeatherAndClock extends StatelessWidget {
                           SizedBox(
                             height: orientation == Orientation.landscape ? 20.h : 8.h,
                             child: Image.asset(
-                              'assets/img/belajandro_256.png',
+                              ImageConstant.belajandro256,
                               fit: BoxFit.contain,
                               height: 10.h,
                             ),
@@ -216,15 +217,11 @@ class WeatherAndClock extends StatelessWidget {
                         location: 'TOKYO, JAPAN',
                         hourText: sc.tokyo.value.substring(0, 2),
                         minuteText: sc.tokyo.value.substring(3, 5),
-                        height: 35.h,
-                        // width: 20.w,
                       ),
                       ClockSkin(
                         location: 'SYDNEY, AUSTRALIA',
                         hourText: sc.sydney.value.substring(0, 2),
                         minuteText: sc.sydney.value.substring(3, 5),
-                        // height: 40.h,
-                        // width: 20.w,
                       ),
                       ClockSkin(
                         location: 'NEW YORK, USA',
