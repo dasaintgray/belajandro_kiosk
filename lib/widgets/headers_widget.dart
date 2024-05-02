@@ -23,7 +23,7 @@ class WeatherAndClock extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         SizedBox(
-          height: orientation == Orientation.landscape ? 15.h : 22.h,
+          height: orientation == Orientation.landscape ? 30.h : 22.h,
           width: double.infinity,
           // color: HenryColors.blueAccent,
           child: Column(
@@ -69,16 +69,17 @@ class WeatherAndClock extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: SizedBox(
-                      height: 13.h,
+                      // color: HenryColors.blueAccent,
+                      height: orientation == Orientation.landscape ? 13.h : 13.h,
                       width: 10.w,
                       child: Column(
                         children: [
                           SizedBox(
-                            height: orientation == Orientation.landscape ? 20.h : 8.h,
+                            height: orientation == Orientation.landscape ? 5.h : 8.h,
                             child: Image.asset(
                               ImageConstant.belajandro256,
                               fit: BoxFit.contain,
-                              height: 10.h,
+                              // height: 10.h,
                             ),
                           ),
                           ListTile(
@@ -87,7 +88,7 @@ class WeatherAndClock extends StatelessWidget {
                               sc.sCOMPANY.value,
                               style: TextStyle(
                                 color: HenryColors.lightGold,
-                                fontSize: 15.sp,
+                                fontSize: orientation == Orientation.landscape ? 10.sp : 15.sp,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: atteron,
                               ),

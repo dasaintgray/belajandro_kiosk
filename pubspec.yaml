@@ -16,15 +16,19 @@ dependencies:
   intl: ^0.19.0
 
   #COMMUNICATION
-  hasura_connect: ^5.0.0+3
+  hasura_connect: ^5.0.0+2
   http: ^1.2.1
   translator: ^1.0.0
 
   #RESPONSIVE 
   responsive_sizer: ^3.2.0
-  win32: ^5.4.0
+
+  #WIN32
+  win32: ^5.5.0
+  windows_networking: ^0.2.0
   ffi: ^2.1.2
   window_manager: ^0.3.8
+  uuid: ^3.0.7
 
   #OTHERS
   virtual_keyboard_custom_layout: ^1.0.0
@@ -34,6 +38,11 @@ dependencies:
   flutter_animate: ^4.5.0
   dotlottie_loader: ^0.0.3
   lottie: ^3.1.0
+
+
+  #CUSTOM
+  csharp_rpc:
+    path: ./library/csharp_rpc
 
 dev_dependencies: 
   flutter_lints: ^3.0.0
@@ -66,3 +75,5 @@ flutter:
     - assets/lotties/
     - assets/flags/
     - assets/rooms/
+    - assets/service/bonwin/
+    - assets/service/printer/
