@@ -1,7 +1,7 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
-import 'package:belajandro_kiosk/services/utils/font_utils.dart';
+import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/menu_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
@@ -36,9 +36,7 @@ class InputBookingNumberView extends GetView {
                 ),
                 TitleHeader(
                   title: hc.titleList.first.translationText,
-                  fontSize: 20.sp,
-                  color: HenryColors.lightGold,
-                  fontFamily: atteron,
+                  textStyle: titleTextStyle,
                 ),
                 Expanded(
                   child: Container(

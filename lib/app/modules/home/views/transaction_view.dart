@@ -1,9 +1,8 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
 import 'package:belajandro_kiosk/app/modules/home/views/ciprocess_view.dart';
-import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
-import 'package:belajandro_kiosk/services/utils/font_utils.dart';
+import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/menu_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
@@ -15,7 +14,6 @@ import 'package:get/get.dart';
 class TransactionView extends GetView {
   // call the controller
   final hc = Get.find<HomeController>();
-  final sc = Get.find<ScreenController>();
 
   TransactionView({super.key});
   @override
@@ -41,9 +39,7 @@ class TransactionView extends GetView {
                 ),
                 TitleHeader(
                   title: hc.titleList.first.translationText,
-                  fontSize: 20.sp,
-                  color: HenryColors.lightGold,
-                  fontFamily: atteron,
+                  textStyle: titleTextStyle,
                 ),
                 Expanded(
                   child: ListView.builder(

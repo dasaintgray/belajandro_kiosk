@@ -1,20 +1,24 @@
 // ignore_for_file: unnecessary_overrides
 
-import 'dart:convert';
+import 'dart:async';
 import 'dart:math';
 import 'dart:ffi' as ffi;
 
 import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/room_type_model.dart';
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
 import 'package:belajandro_kiosk/services/constant/lottie_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
-import 'package:belajandro_kiosk/services/providers/service_providers.dart';
+import 'package:belajandro_kiosk/services/service_model/service_model.dart';
+import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:csharp_rpc/csharp_rpc.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -25,10 +29,17 @@ class HomeController extends GetxController {
   // boolean
   final isLoading = true.obs;
   final isBonwinCardDeviceReady = false.obs;
+  final isShiftEnabled = false.obs;
+  final isNumericMode = false.obs;
+  // final isInitialized = false.obs; //for camera initialization
+  final isCameraReady = false.obs;
 
   // integer area
   final languageID = 1.obs;
   final selectedRoomType = 0.obs;
+  final selectedPaymentType = 0.obs; //cash
+  final cameraID = 0.obs;
+  final selectedPrefixID = 1.obs;
 
   // LIST
   final menuList = <MenuModel>[];
@@ -36,12 +47,14 @@ class HomeController extends GetxController {
   final titleList = <Menu>[].obs;
   final paymentTypeList = <PaymentTypeModel>[];
   final roomTypeList = <RoomTypeModel>[];
+  final prefixList = <PrefixModel>[];
+
   final List animationList = [
     LottieConstant.circularProgress,
     LottieConstant.harddisk,
     LottieConstant.kamay,
-    LottieConstant.meeting
   ];
+  final cameraList = [].obs;
 
   // STRING
   final pageTitle = ''.obs;
@@ -51,14 +64,32 @@ class HomeController extends GetxController {
   final dateCount = '0'.obs;
   final rangeCount = '0'.obs;
   final noofdays = 0.obs;
+  final typeText = ''.obs; //hold the text that user typed on virtual keyboard
+  final selectedPrefixData = 'MR'.obs;
+  final cameraInfo = ''.obs;
 
   // translator
   final isalin = tagasalin.GoogleTranslator();
+
+  // TextEditing Controllers for Guest Information
+  final TextEditingController firstName = TextEditingController();
+  final TextEditingController lastName = TextEditingController();
+  final TextEditingController middleName = TextEditingController();
+  final TextEditingController discriminator = TextEditingController(); //auto filled = Contact
+  final globalTEC = TextEditingController().obs;
+
+  // LATE DECLARTION
+  late Size previewSize;
+
+  // OTHERS
+  StreamSubscription<CameraClosingEvent>? errorStreamSubscription;
+  StreamSubscription<CameraClosingEvent>? cameraClosingEvent;
 
   @override
   void onInit() async {
     super.onInit();
     await fetchMenu(langID: 1);
+    await fetchPrefix();
   }
 
   @override
@@ -103,6 +134,14 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    firstName.dispose();
+    lastName.dispose();
+    middleName.dispose();
+    // CameraPlatform.instance.dispose(cameraID.value);
+    errorStreamSubscription?.cancel();
+    errorStreamSubscription = null;
+    cameraClosingEvent?.cancel();
+    cameraClosingEvent = null;
   }
 
   Future<Map<String, dynamic>> processBonwinCard(
@@ -124,6 +163,70 @@ class HomeController extends GetxController {
     }
     rpcservice.dispose(); //shutdown the service
     return response;
+  }
+
+  void keyboardListeners() {
+    firstName.addListener(() {
+      globalTEC.value = firstName;
+    });
+    lastName.addListener(() {
+      globalTEC.value = lastName;
+    });
+
+    middleName.addListener(() {
+      globalTEC.value = middleName;
+    });
+  }
+
+  // CAMERA
+  Future<bool?> initializeCamera() async {
+    // assert(!isInitialized.value);
+
+    if (cameraList.isEmpty) {
+      return false;
+    }
+    try {
+      final CameraDescription camera = cameraList[0];
+      cameraID.value = await CameraPlatform.instance.createCamera(camera, ResolutionPreset.veryHigh);
+      errorStreamSubscription?.cancel();
+
+      final Future<CameraInitializedEvent> initialized =
+          CameraPlatform.instance.onCameraInitialized(cameraID.value).first;
+
+      await CameraPlatform.instance.initializeCamera(cameraID.value);
+      final CameraInitializedEvent event = await initialized;
+      previewSize = Size(event.previewWidth, event.previewHeight);
+
+      return true;
+    } on CameraException catch (e) {
+      if (cameraID.value >= 0) {
+        await CameraPlatform.instance.dispose(cameraID.value);
+      } else {
+        if (kDebugMode) {
+          print('Faied to dispose camera ${e.code} : ${e.description}');
+        }
+        return false;
+      }
+    }
+    return false;
+  }
+
+  Future<void> getCamera() async {
+    try {
+      final result = await CameraPlatform.instance.availableCameras();
+      cameraList.addAll(result);
+      // cameraList.value = await CameraPlatform.instance.availableCameras();
+      // isInitialized.value = true;
+      isCameraReady.value = true; // ready to initialized
+      if (cameraList.isEmpty) {
+        cameraInfo.value = 'No Available Camera';
+      } else {
+        isCameraReady.value = true;
+        debugPrint(cameraList.toString());
+      }
+    } on PlatformException catch (e) {
+      cameraInfo.value = 'Failed to get cameras : ${e.code} : ${e.message}';
+    }
   }
 
   void printConnectionInformation(ConnectionProfile? profile) {
@@ -182,7 +285,7 @@ class HomeController extends GetxController {
   }
 
   Future<bool?> fetchMenu({required int? langID}) async {
-    final response = await getMenuInformation(
+    final response = await ServiceModel.getMenuInformation(
         headers: GlobalConstant.globalHeader, graphQLURL: GlobalConstant.gqlURL, documents: GQLData.qryTranslation);
     if (response != null) {
       menuList.add(response);
@@ -198,7 +301,7 @@ class HomeController extends GetxController {
   }
 
   Future<bool?> fetchPayment({required String? langCode}) async {
-    final response = await getPaymentType(
+    final response = await ServiceModel.getPaymentType(
         headers: GlobalConstant.globalHeader, graphQLURL: GlobalConstant.gqlURL, documents: GQLData.qryPaymentTypes);
     if (response != null) {
       if (languageID.value > 1) {
@@ -217,7 +320,7 @@ class HomeController extends GetxController {
   }
 
   Future<bool?> fetchRoomTypes({required String? langCode}) async {
-    final response = await getRoomTypes(documents: GQLData.qryRoomType);
+    final response = await ServiceModel.getRoomTypes(documents: GQLData.qryRoomType);
     if (response != null) {
       if (languageID.value > 1) {
         for (var i = 0; i < response.length; i++) {
@@ -228,6 +331,16 @@ class HomeController extends GetxController {
       }
       roomTypeList.clear();
       roomTypeList.addAll(response);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool?> fetchPrefix() async {
+    final response = await ServiceModel.getPrefix(documents: GQLData.qPrefix);
+    if (response != null) {
+      prefixList.addAll(response);
       return true;
     } else {
       return false;
@@ -486,45 +599,4 @@ class HomeController extends GetxController {
     }
     return false;
   }
-
-  /// ==========================================================================
-  /// FETCHING GRAPHQL DOCUMENTS
-  /// AUTHOR: HENRY V. MEMPIN
-  /// DATE: 26 APRIL 2024
-  /// ==========================================================================
-  Future<MenuModel?> getMenuInformation(
-      {required Map<String, String> headers,
-      required String? graphQLURL,
-      required String? documents,
-      Map<String, dynamic>? docVar}) async {
-    final response = await ServiceProvider.gQLQuery(graphQLURL: graphQLURL, documents: documents, headers: headers);
-    if (response['data']['menu'] != null) {
-      return menuModelFromJson(jsonEncode(response));
-    } else {
-      return null;
-    }
-  }
-
-  Future<List<PaymentTypeModel>?> getPaymentType(
-      {required Map<String, String> headers,
-      required String? graphQLURL,
-      required String? documents,
-      Map<String, dynamic>? docVar}) async {
-    final response = await ServiceProvider.gQLQuery(graphQLURL: graphQLURL, documents: documents, headers: headers);
-    if (response['data']['PaymentTypes'] != null) {
-      return paymentTypeModelFromJson(jsonEncode(response['data']['PaymentTypes']));
-    } else {
-      return null;
-    }
-  }
-
-  Future<List<RoomTypeModel>?> getRoomTypes({required String? documents, Map<String, dynamic>? docVar}) async {
-    final response = await ServiceProvider.gQLQuery(
-        graphQLURL: GlobalConstant.gqlURL, documents: documents, headers: GlobalConstant.globalHeader);
-    if (response['data']['vRoomTypes'] != null) {
-      return roomTypeModelFromJson(jsonEncode(response['data']['vRoomTypes']));
-    } else {
-      return null;
-    }
-  }
-}
+} //end of class

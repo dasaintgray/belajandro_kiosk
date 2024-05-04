@@ -208,8 +208,10 @@ class ScreenController extends GetxController with BaseController {
       weatherList.add(weatherResponse);
       imgURL.value = 'http:${weatherResponse.current.condition.icon}';
       weatherLocation.value = "${weatherResponse.location.name}, ${weatherResponse.location.country}";
+      isLoading.value = false;
       return true;
     }
+    isLoading.value = true;
     return false;
   }
 

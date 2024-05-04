@@ -90,6 +90,29 @@ class GQLData {
 }
 ''';
 
+  static String qrySeriesDetails = r'''
+  query getSeriesDetails($moduleID: Int!) {
+  SeriesDetails(where: {ModuleId: {_eq: $moduleID}, isActive: {_eq: true}}, limit: 1) {
+    Id
+    SeriesId
+    docNo
+    description
+    LocationId
+    ModuleId
+    isActive
+    tranDate
+  }
+}
+''';
+
+  static String qPrefix = r'''
+  query getPrefix {
+    Prefixes {
+      Id
+      description
+      }
+    }''';
+
   /// MUTATION
   /// --------------------------------------------------------------------------
 

@@ -3,6 +3,7 @@ import 'package:belajandro_kiosk/app/modules/home/views/payment_type_view.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/font_utils.dart';
+import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
 import 'package:flutter/material.dart';
@@ -38,9 +39,7 @@ class NoofdaysView extends GetView {
                 ),
                 TitleHeader(
                   title: tituto,
-                  fontSize: 20.sp,
-                  color: HenryColors.lightGold,
-                  fontFamily: atteron,
+                  textStyle: titleTextStyle,
                 ),
                 Expanded(
                   child: Column(
@@ -120,6 +119,7 @@ class NoofdaysView extends GetView {
                                 final response = await hc.fetchPayment(langCode: hc.languageCode.value);
                                 if (response!) {
                                   hc.isLoading.value = false;
+                                  await hc.getCamera();
                                   Get.to(
                                     () => PaymentTypeView(
                                       titulo: translatedText!,

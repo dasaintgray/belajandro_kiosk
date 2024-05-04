@@ -10,6 +10,11 @@ class HenryStyle {
     // ),
     backgroundColor: HenryColors.teal,
   );
-
-  TextStyle globalTextStyle = TextStyle(fontSize: 20.sp, fontFamily: bernardMT, color: HenryColors.puti);
 }
+
+final TextStyle globalTextStyle = TextStyle(fontSize: 20.sp, fontFamily: bernardMT, color: HenryColors.puti);
+final TextStyle titleTextStyle = TextStyle(
+  fontSize: 20.sp,
+  fontFamily: bernardMT,
+  color: HenryColors.teal,
+);

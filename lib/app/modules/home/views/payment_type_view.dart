@@ -1,7 +1,8 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
+import 'package:belajandro_kiosk/app/modules/home/views/guest_info_view.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
-import 'package:belajandro_kiosk/services/utils/font_utils.dart';
+import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/menu_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
@@ -39,9 +40,7 @@ class PaymentTypeView extends GetView {
                 ),
                 TitleHeader(
                   title: titulo,
-                  fontSize: 20.sp,
-                  color: HenryColors.lightGold,
-                  fontFamily: atteron,
+                  textStyle: titleTextStyle,
                 ),
                 Expanded(
                   child: Container(
@@ -54,12 +53,41 @@ class PaymentTypeView extends GetView {
                           imageName: 'assets/icons/payment${hc.paymentTypeList[index].id}.png',
                           cardColor: HenryColors.teal,
                           shadowColor: HenryColors.teal.withOpacity(0.5),
-                          onTap: () {},
+                          onTap: () async {
+                            hc.isLoading.value = true;
+                            hc.selectedPaymentType.value = hc.paymentTypeList[index].id;
+                            final translatedText = await hc.iTranslate(
+                                languageCode: hc.languageCode.value, sourceText: 'GUEST INFORMATION');
+                            hc.keyboardListeners(); //activate the keyboard listener
+                            final result = await hc.initializeCamera();
+                            if (result!) {
+                              Get.to(
+                                () => GuestInfoView(titulo: translatedText!),
+                              );
+                            } else {
+                              Get.defaultDialog(title: 'Error', middleText: 'CAMERA INIT FAILED');
+                            }
+                          },
                         );
                       },
                     ),
                   ),
                 ),
+                // TEMPORARY
+                // Container(
+                //   color: HenryColors.gold,
+                //   height: 15.h,
+                //   width: double.infinity,
+                //   child: ListView.builder(
+                //     itemCount: hc.cameraList.length,
+                //     itemBuilder: (buildContext, index) {
+                //       return Text(
+                //         hc.cameraList[index].toString(),
+                //         style: TextStyle(color: HenryColors.puti, fontSize: 12.sp),
+                //       );
+                //     },
+                //   ),
+                // ),
                 SizedBox(
                   height: 5.h,
                   width: double.infinity,
