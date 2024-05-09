@@ -58,15 +58,19 @@ class PaymentTypeView extends GetView {
                             hc.selectedPaymentType.value = hc.paymentTypeList[index].id;
                             final translatedText = await hc.iTranslate(
                                 languageCode: hc.languageCode.value, sourceText: 'GUEST INFORMATION');
-                            hc.keyboardListeners(); //activate the keyboard listener
-                            final result = await hc.initializeCamera();
-                            if (result!) {
-                              Get.to(
-                                () => GuestInfoView(titulo: translatedText!),
-                              );
-                            } else {
-                              Get.defaultDialog(title: 'Error', middleText: 'CAMERA INIT FAILED');
-                            }
+                            // hc.keyboardListeners(); //activate the keyboard listener
+                            await hc.initializeCamera();
+                            Get.to(
+                              () => GuestInfoView(titulo: translatedText!),
+                            );
+                            // final result = await hc.initializeCamera();
+                            // if (result!) {
+                            //   Get.to(
+                            //     () => GuestInfoView(titulo: translatedText!),
+                            //   );
+                            // } else {
+                            //   Get.defaultDialog(title: 'Error', middleText: 'CAMERA INIT FAILED');
+                            // }
                           },
                         );
                       },

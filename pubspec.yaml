@@ -42,8 +42,8 @@ dependencies:
   
 
   #IMAGING
+  # camera_universal: ^0.0.3
   camera_windows: ^0.2.2
-  camera_platform_interface: ^2.7.4
 
 
   #CUSTOM

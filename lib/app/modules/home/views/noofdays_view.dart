@@ -119,7 +119,8 @@ class NoofdaysView extends GetView {
                                 final response = await hc.fetchPayment(langCode: hc.languageCode.value);
                                 if (response!) {
                                   hc.isLoading.value = false;
-                                  await hc.getCamera();
+                                  // await hc.initCamera();
+                                  // await hc.getCamera();
                                   Get.to(
                                     () => PaymentTypeView(
                                       titulo: translatedText!,

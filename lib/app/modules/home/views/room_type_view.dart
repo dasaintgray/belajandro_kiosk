@@ -70,6 +70,7 @@ class RoomTypeView extends GetView {
                                       hc.isLoading.value = false;
                                       hc.pageTitle.value = 'SELECT NUMBER OF DAYS';
                                     }
+                                    await hc.getCamera();
                                     Get.to(
                                       () => NoofdaysView(
                                         tituto: hc.pageTitle.value,

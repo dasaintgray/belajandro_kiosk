@@ -7,7 +7,6 @@ import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/textformfield_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
-import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -15,6 +14,9 @@ import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 import 'package:get/get.dart';
 import 'package:virtual_keyboard_custom_layout/virtual_keyboard_custom_layout.dart';
+// ignore: depend_on_referenced_packages
+import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:win32/win32.dart';
 
 class GuestInfoView extends GetView {
   final String titulo;
@@ -25,6 +27,8 @@ class GuestInfoView extends GetView {
   @override
   Widget build(BuildContext context) {
     final imgKey = GlobalKey();
+    final formKey = GlobalKey();
+
     return rs.ResponsiveSizer(
       builder: (buildContext, orientation, screenType) {
         return Scaffold(
@@ -57,7 +61,9 @@ class GuestInfoView extends GetView {
                     key: imgKey,
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(math.pi),
-                    child: CameraPlatform.instance.buildPreview(hc.cameraID.value),
+                    child: Obx(
+                      () => CameraPlatform.instance.buildPreview(hc.cameraID.value),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -66,6 +72,7 @@ class GuestInfoView extends GetView {
                       Container(
                         padding: EdgeInsets.only(left: 25.sp, right: 25.sp, top: 10.sp, bottom: 10.sp),
                         child: Form(
+                          key: formKey,
                           child: SingleChildScrollView(
                               child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -132,19 +139,27 @@ class GuestInfoView extends GetView {
                                     Expanded(
                                       flex: 3,
                                       child: KioskTextFormField(
-                                          textEditingController: hc.firstName, tecLabel: ' FIRST NAME '),
+                                        textEditingController: hc.firstName,
+                                        tecLabel: ' FIRST NAME ',
+                                        onTap: () {
+                                          hc.globalTEC.value = hc.firstName;
+                                        },
+                                      ),
                                     ),
                                     SizedBox(
                                       height: 0.5.h,
                                       width: 1.w,
                                     ),
                                     Expanded(
-                                        flex: 1,
-                                        child: KioskTextFormField(
-                                          textEditingController: hc.middleName,
-                                          tecLabel: ' M.I. ',
-                                          // maxLength: 4,
-                                        )),
+                                      flex: 1,
+                                      child: KioskTextFormField(
+                                        textEditingController: hc.middleName,
+                                        tecLabel: ' M.I. ',
+                                        onTap: () {
+                                          hc.globalTEC.value = hc.middleName;
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 SizedBox(
@@ -155,29 +170,64 @@ class GuestInfoView extends GetView {
                                   height: 1.h,
                                   width: double.infinity,
                                 ),
-                                KioskTextFormField(textEditingController: hc.lastName, tecLabel: ' LAST NAME '),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: KioskTextFormField(
+                                        textEditingController: hc.lastName,
+                                        tecLabel: ' LAST NAME ',
+                                        onTap: () {
+                                          hc.globalTEC.value = hc.lastName;
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Obx(
+                                        () => Visibility(
+                                          visible: !hc.isButtonSubmitReady.value,
+                                          child: TextButton.icon(
+                                            onPressed: () {
+                                              if (hc.firstName.text.isNotEmpty &&
+                                                  hc.lastName.text.isNotEmpty &&
+                                                  hc.middleName.text.isNotEmpty) {
+                                                hc.isButtonSubmitReady.value = true;
+                                              }
+                                            },
+                                            icon: const Icon(Icons.done),
+                                            label: Text(
+                                              'Finish',
+                                              style: TextStyle(color: HenryColors.puti, fontSize: 18.sp),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           )),
                         ),
                       ),
                       SizedBox(
-                        height: 2.h,
+                        height: 1.h,
                         width: double.infinity,
                       ),
-                      Obx(
-                        () => SizedBox(
-                          height: 25.h,
-                          width: double.infinity,
-                          child: VirtualKeyboard(
+                      SizedBox(
+                        height: 20.h,
+                        width: 70.w,
+                        child: Obx(
+                          () => VirtualKeyboard(
                             textController: hc.globalTEC.value,
                             textColor: HenryColors.puti,
                             fontSize: 18.sp,
                             type: VirtualKeyboardType.Custom,
                             keys: const [
                               ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "BACKSPACE"],
-                              ["a", "s", "d", "f", "g", "h", "j", "k", "l", "RETURN"],
-                              ["z", "x", "c", "v", "b", "n", 'ñ', "m", '.'],
+                              ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+                              ["z", "x", "c", "v", "b", "n", 'ñ', "m", "."],
                               ["SPACE"],
                             ],
                             alwaysCaps: true,
@@ -187,11 +237,35 @@ class GuestInfoView extends GetView {
                     ],
                   ),
                 ),
+                //BUTTON REGISTER
+                Obx(
+                  () => Visibility(
+                    visible: hc.isButtonSubmitReady.value,
+                    child: SizedBox(
+                      height: 5.h,
+                      width: 25.w,
+                      child: ElevatedButton(
+                        onPressed: () {},
+                        autofocus: true,
+                        style: ElevatedButton.styleFrom(backgroundColor: HenryColors.teal),
+                        child: Text(
+                          'REGISTER',
+                          style: TextStyle(color: HenryColors.puti, fontSize: 15.sp),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 5.h,
+                ),
                 SizedBox(
                   height: 5.h,
                   width: double.infinity,
                   child: InkWell(
                     onTap: () {
+                      hc.disposeCamera();
+                      hc.clearTextEditingController();
                       Get.back();
                     },
                     child: Image.asset(

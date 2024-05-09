@@ -60,4 +60,14 @@ class Validator {
       return null;
     }
   }
+
+  static String? validateTextOnly(String value) {
+    Pattern pattern = r'^[a-zA-Z]';
+    RegExp regExp = RegExp(pattern as String);
+    if (!regExp.hasMatch(value)) {
+      return 'Only Character are allowed';
+    } else {
+      return null;
+    }
+  }
 }

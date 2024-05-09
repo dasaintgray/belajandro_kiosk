@@ -1,6 +1,8 @@
 // ignore_for_file: unnecessary_overrides
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ffi' as ffi;
 
@@ -12,7 +14,6 @@ import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dar
 import 'package:belajandro_kiosk/services/constant/lottie_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/service_model/service_model.dart';
-import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:csharp_rpc/csharp_rpc.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
@@ -25,21 +26,23 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:translator/translator.dart' as tagasalin;
 import 'package:windows_networking/windows_networking.dart';
 
+// ignore: depend_on_referenced_packages
+import 'package:camera_platform_interface/camera_platform_interface.dart';
+
 class HomeController extends GetxController {
   // boolean
   final isLoading = true.obs;
   final isBonwinCardDeviceReady = false.obs;
   final isShiftEnabled = false.obs;
   final isNumericMode = false.obs;
-  // final isInitialized = false.obs; //for camera initialization
-  final isCameraReady = false.obs;
+  final isButtonSubmitReady = false.obs;
 
   // integer area
   final languageID = 1.obs;
   final selectedRoomType = 0.obs;
   final selectedPaymentType = 0.obs; //cash
-  final cameraID = 0.obs;
   final selectedPrefixID = 1.obs;
+  final noofdays = 0.obs;
 
   // LIST
   final menuList = <MenuModel>[];
@@ -54,7 +57,6 @@ class HomeController extends GetxController {
     LottieConstant.harddisk,
     LottieConstant.kamay,
   ];
-  final cameraList = [].obs;
 
   // STRING
   final pageTitle = ''.obs;
@@ -63,10 +65,8 @@ class HomeController extends GetxController {
   final selectedDate = ''.obs;
   final dateCount = '0'.obs;
   final rangeCount = '0'.obs;
-  final noofdays = 0.obs;
   final typeText = ''.obs; //hold the text that user typed on virtual keyboard
   final selectedPrefixData = 'MR'.obs;
-  final cameraInfo = ''.obs;
 
   // translator
   final isalin = tagasalin.GoogleTranslator();
@@ -81,9 +81,16 @@ class HomeController extends GetxController {
   // LATE DECLARTION
   late Size previewSize;
 
-  // OTHERS
+  // CAMERA
+  final cameraInfo = 'Unkown'.obs;
+  final cameraList = [].obs;
+  final isInitialized = false.obs;
+  final cameraID = 0.obs;
   StreamSubscription<CameraClosingEvent>? errorStreamSubscription;
   StreamSubscription<CameraClosingEvent>? cameraClosingEvent;
+
+  // final CameraController cameraController = CameraController();
+  // final ImagePickerPlatform imagePickerPlatform = ImagePickerPlatform.instance;
 
   @override
   void onInit() async {
@@ -134,14 +141,10 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    // cameraController.dispose();
     firstName.dispose();
     lastName.dispose();
     middleName.dispose();
-    // CameraPlatform.instance.dispose(cameraID.value);
-    errorStreamSubscription?.cancel();
-    errorStreamSubscription = null;
-    cameraClosingEvent?.cancel();
-    cameraClosingEvent = null;
   }
 
   Future<Map<String, dynamic>> processBonwinCard(
@@ -168,64 +171,26 @@ class HomeController extends GetxController {
   void keyboardListeners() {
     firstName.addListener(() {
       globalTEC.value = firstName;
-    });
-    lastName.addListener(() {
-      globalTEC.value = lastName;
+      if (firstName.text.isNotEmpty && lastName.text.isNotEmpty && middleName.text.isNotEmpty) {
+        isButtonSubmitReady.value = true;
+      }
     });
 
     middleName.addListener(() {
       globalTEC.value = middleName;
+      if (firstName.text.isNotEmpty && lastName.text.isNotEmpty && middleName.text.isNotEmpty) {
+        isButtonSubmitReady.value = true;
+      }
     });
-  }
 
-  // CAMERA
-  Future<bool?> initializeCamera() async {
-    // assert(!isInitialized.value);
-
-    if (cameraList.isEmpty) {
-      return false;
-    }
-    try {
-      final CameraDescription camera = cameraList[0];
-      cameraID.value = await CameraPlatform.instance.createCamera(camera, ResolutionPreset.veryHigh);
-      errorStreamSubscription?.cancel();
-
-      final Future<CameraInitializedEvent> initialized =
-          CameraPlatform.instance.onCameraInitialized(cameraID.value).first;
-
-      await CameraPlatform.instance.initializeCamera(cameraID.value);
-      final CameraInitializedEvent event = await initialized;
-      previewSize = Size(event.previewWidth, event.previewHeight);
-
-      return true;
-    } on CameraException catch (e) {
-      if (cameraID.value >= 0) {
-        await CameraPlatform.instance.dispose(cameraID.value);
-      } else {
-        if (kDebugMode) {
-          print('Faied to dispose camera ${e.code} : ${e.description}');
-        }
-        return false;
+    lastName.addListener(() {
+      globalTEC.value = lastName;
+      if (firstName.text.isNotEmpty && lastName.text.isNotEmpty && middleName.text.isNotEmpty) {
+        isButtonSubmitReady.value = true;
       }
-    }
-    return false;
-  }
-
-  Future<void> getCamera() async {
-    try {
-      final result = await CameraPlatform.instance.availableCameras();
-      cameraList.addAll(result);
-      // cameraList.value = await CameraPlatform.instance.availableCameras();
-      // isInitialized.value = true;
-      isCameraReady.value = true; // ready to initialized
-      if (cameraList.isEmpty) {
-        cameraInfo.value = 'No Available Camera';
-      } else {
-        isCameraReady.value = true;
-        debugPrint(cameraList.toString());
-      }
-    } on PlatformException catch (e) {
-      cameraInfo.value = 'Failed to get cameras : ${e.code} : ${e.message}';
+    });
+    if (firstName.text.isNotEmpty && lastName.text.isNotEmpty && middleName.text.isNotEmpty) {
+      isButtonSubmitReady.value = true;
     }
   }
 
@@ -599,4 +564,78 @@ class HomeController extends GetxController {
     }
     return false;
   }
-} //end of class
+
+  Future<void> getCamera() async {
+    try {
+      cameraList.value = await CameraPlatform.instance.availableCameras();
+      if (cameraList.isEmpty) {
+        cameraInfo.value = "No Available Camera";
+      } else {
+        debugPrint(cameraList.toString());
+      }
+    } on PlatformException catch (e) {
+      cameraInfo.value = 'Failed to get cameras : ${e.code} : ${e.message}';
+    }
+  }
+
+  Future<void> initializeCamera() async {
+    assert(!isInitialized.value);
+
+    if (cameraList.isEmpty) {
+      return;
+    }
+
+    try {
+      final CameraDescription cameraDescription = cameraList[0];
+      cameraID.value = await CameraPlatform.instance.createCamera(cameraDescription, ResolutionPreset.veryHigh);
+      errorStreamSubscription?.cancel();
+
+      final Future<CameraInitializedEvent> cameraInitialized =
+          CameraPlatform.instance.onCameraInitialized(cameraID.value).first;
+
+      await CameraPlatform.instance.initializeCamera(cameraID.value);
+
+      final CameraInitializedEvent event = await cameraInitialized;
+      previewSize = Size(event.previewWidth, event.previewHeight);
+    } on CameraException catch (e) {
+      if (cameraID.value >= 0) {
+        await CameraPlatform.instance.dispose(cameraID.value);
+      } else {
+        debugPrint('Failed to dispose camera ${e.code} : ${e.description}');
+      }
+    }
+  }
+
+  Future<void> disposeCamera() async {
+    if (cameraID.value >= 0) {
+      try {
+        await CameraPlatform.instance.dispose(cameraID.value);
+      } on CameraException catch (e) {
+        cameraInfo.value = 'Failed to dispose camera ${e.code} : ${e.description}';
+      }
+    }
+  }
+
+  Future<String?> takePicture({required int? camID}) async {
+    // final XFile pictureFile = await CameraPlatform.instance.takePicture(cameraID.value);
+    final XFile pictureFile = await CameraPlatform.instance.takePicture(camID!);
+    final imgBytes = File(pictureFile.path).readAsBytesSync();
+
+    final img64 = base64Encode(imgBytes);
+    if (img64.isNotEmpty) {
+      File(pictureFile.path).delete();
+      return img64.toString();
+    } else {
+      return '';
+    }
+  }
+
+  void clearTextEditingController() {
+    firstName.clear();
+    middleName.clear();
+    lastName.clear();
+    isButtonSubmitReady.value = false;
+  }
+
+  
+}
