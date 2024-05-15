@@ -15,7 +15,8 @@ import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 class NoofdaysView extends GetView {
   final hc = Get.find<HomeController>();
   final String tituto;
-  NoofdaysView({super.key, required this.tituto});
+  final String? buttonText;
+  NoofdaysView({super.key, required this.tituto, required this.buttonText});
   @override
   Widget build(BuildContext context) {
     return rs.ResponsiveSizer(

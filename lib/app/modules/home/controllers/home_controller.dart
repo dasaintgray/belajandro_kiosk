@@ -36,6 +36,8 @@ class HomeController extends GetxController {
   final isShiftEnabled = false.obs;
   final isNumericMode = false.obs;
   final isButtonSubmitReady = false.obs;
+  final isNumericKeypad = false.obs;
+  final isEmailKeypad = false.obs;
 
   // integer area
   final languageID = 1.obs;
@@ -58,6 +60,28 @@ class HomeController extends GetxController {
     LottieConstant.kamay,
   ];
 
+  final customKey = const [
+    // ['@', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "BACKSPACE"],
+    ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+    ["z", "x", "c", "v", "b", "n", 'ñ', "m", "."],
+    ["SPACE"],
+  ];
+
+  final emailKey = const [
+    ['@', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "BACKSPACE"],
+    ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+    ["z", "x", "c", "v", "b", "n", "m", "."],
+    ['@gmail.com', '@yahoo.com'],
+  ];
+
+  final numericOnly = const [
+    ['1', '2', '3', '4'],
+    ['5', '6', '7', '8'],
+    ['9', '0', '+'],
+  ];
+
   // STRING
   final pageTitle = ''.obs;
   final languageCode = ''.obs;
@@ -67,6 +91,7 @@ class HomeController extends GetxController {
   final rangeCount = '0'.obs;
   final typeText = ''.obs; //hold the text that user typed on virtual keyboard
   final selectedPrefixData = 'MR'.obs;
+  final keypadType = 'text'.obs;
 
   // translator
   final isalin = tagasalin.GoogleTranslator();
@@ -75,6 +100,9 @@ class HomeController extends GetxController {
   final TextEditingController firstName = TextEditingController();
   final TextEditingController lastName = TextEditingController();
   final TextEditingController middleName = TextEditingController();
+  final TextEditingController phoneNumber = TextEditingController();
+  final TextEditingController emailAddress = TextEditingController();
+
   final TextEditingController discriminator = TextEditingController(); //auto filled = Contact
   final globalTEC = TextEditingController().obs;
 
@@ -91,6 +119,10 @@ class HomeController extends GetxController {
 
   // final CameraController cameraController = CameraController();
   // final ImagePickerPlatform imagePickerPlatform = ImagePickerPlatform.instance;
+  final pera = NumberFormat.currency(locale: "en_PH", symbol: "₱");
+
+  // SCROLL CONTROLLER
+  final disclaimer = ScrollController();
 
   @override
   void onInit() async {
@@ -146,6 +178,10 @@ class HomeController extends GetxController {
     lastName.dispose();
     middleName.dispose();
   }
+
+  /// TRANSACTION
+  /// --------------------------------------------------------------------------
+  Future addTransaction() async {}
 
   Future<Map<String, dynamic>> processBonwinCard(
       {required String servicePath, required String command, List<dynamic>? params}) async {
@@ -223,32 +259,6 @@ class HomeController extends GetxController {
     }
   }
 
-  (double? sW, double? sH) getScreenSize(BuildContext context) {
-    return (context.width, context.height);
-  }
-
-  String generateLotties() {
-    return animationList[Random().nextInt(animationList.length)];
-  }
-
-  void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
-    if (args.value is PickerDateRange) {
-      range.value = '${DateFormat('MMMM dd').format(args.value.startDate)} -'
-          ' ${DateFormat('MMMM dd').format(args.value.endDate ?? args.value.startDate)}';
-      if (args.value.endDate != null) {
-        // rangeCount.value = args.value.endDate.difference(args.value.startDate).inDays + 1;
-        noofdays.value = args.value.endDate.difference(args.value.startDate).inDays + 1;
-        if (kDebugMode) print(args.value.endDate.difference(args.value.startDate).inDays + 1);
-      }
-    } else if (args.value is DateTime) {
-      selectedDate.value = args.value.toString();
-    } else if (args.value is List<DateTime>) {
-      dateCount.value = args.value.length.toString();
-    } else {
-      rangeCount.value = args.value.length.toString();
-    }
-  }
-
   Future<bool?> fetchMenu({required int? langID}) async {
     final response = await ServiceModel.getMenuInformation(
         headers: GlobalConstant.globalHeader, graphQLURL: GlobalConstant.gqlURL, documents: GQLData.qryTranslation);
@@ -258,11 +268,6 @@ class HomeController extends GetxController {
     } else {
       return false;
     }
-  }
-
-  Future<String?> iTranslate({required String languageCode, required String sourceText}) async {
-    final response = await isalin.translate(sourceText, to: languageCode);
-    return response.toString();
   }
 
   Future<bool?> fetchPayment({required String? langCode}) async {
@@ -285,7 +290,7 @@ class HomeController extends GetxController {
   }
 
   Future<bool?> fetchRoomTypes({required String? langCode}) async {
-    final response = await ServiceModel.getRoomTypes(documents: GQLData.qryRoomType);
+    final response = await ServiceModel.getRoomTypes(documents: GQLData.qRoomType);
     if (response != null) {
       if (languageID.value > 1) {
         for (var i = 0; i < response.length; i++) {
@@ -637,5 +642,34 @@ class HomeController extends GetxController {
     isButtonSubmitReady.value = false;
   }
 
-  
+  (double? sW, double? sH) getScreenSize(BuildContext context) {
+    return (context.width, context.height);
+  }
+
+  String generateLotties() {
+    return animationList[Random().nextInt(animationList.length)];
+  }
+
+  void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+    if (args.value is PickerDateRange) {
+      range.value = '${DateFormat('MMMM dd').format(args.value.startDate)} -'
+          ' ${DateFormat('MMMM dd').format(args.value.endDate ?? args.value.startDate)}';
+      if (args.value.endDate != null) {
+        // rangeCount.value = args.value.endDate.difference(args.value.startDate).inDays + 1;
+        noofdays.value = args.value.endDate.difference(args.value.startDate).inDays + 1;
+        if (kDebugMode) print(args.value.endDate.difference(args.value.startDate).inDays + 1);
+      }
+    } else if (args.value is DateTime) {
+      selectedDate.value = args.value.toString();
+    } else if (args.value is List<DateTime>) {
+      dateCount.value = args.value.length.toString();
+    } else {
+      rangeCount.value = args.value.length.toString();
+    }
+  }
+
+  Future<String?> iTranslate({required String languageCode, required String sourceText}) async {
+    final response = await isalin.translate(sourceText, to: languageCode);
+    return response.toString();
+  }
 }

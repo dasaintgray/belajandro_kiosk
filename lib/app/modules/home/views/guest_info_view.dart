@@ -16,7 +16,6 @@ import 'package:get/get.dart';
 import 'package:virtual_keyboard_custom_layout/virtual_keyboard_custom_layout.dart';
 // ignore: depend_on_referenced_packages
 import 'package:camera_platform_interface/camera_platform_interface.dart';
-import 'package:win32/win32.dart';
 
 class GuestInfoView extends GetView {
   final String titulo;
@@ -54,15 +53,18 @@ class GuestInfoView extends GetView {
                   title: titulo,
                   textStyle: titleTextStyle,
                 ),
-                SizedBox(
-                  height: 10.h,
-                  width: 35.w,
-                  child: Transform(
-                    key: imgKey,
-                    alignment: Alignment.center,
-                    transform: Matrix4.rotationY(math.pi),
-                    child: Obx(
-                      () => CameraPlatform.instance.buildPreview(hc.cameraID.value),
+                Visibility(
+                  visible: true,
+                  child: SizedBox(
+                    height: 10.h,
+                    width: 35.w,
+                    child: Transform(
+                      key: imgKey,
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(math.pi),
+                      child: Obx(
+                        () => CameraPlatform.instance.buildPreview(hc.cameraID.value),
+                      ),
                     ),
                   ),
                 ),
@@ -96,11 +98,12 @@ class GuestInfoView extends GetView {
                                               selectedItem: hc.selectedPrefixData.value,
                                               dropdownDecoratorProps: DropDownDecoratorProps(
                                                 dropdownSearchDecoration: InputDecoration(
-                                                    labelText: 'Honorifics',
-                                                    filled: true,
-                                                    labelStyle: TextStyle(
-                                                      color: HenryColors.itim,
-                                                    )),
+                                                  labelText: 'Honorifics',
+                                                  filled: true,
+                                                  labelStyle: TextStyle(
+                                                    color: HenryColors.itim,
+                                                  ),
+                                                ),
                                                 textAlign: TextAlign.center,
                                                 baseStyle: TextStyle(color: HenryColors.itim, fontSize: 15.sp),
                                               ),
@@ -143,7 +146,13 @@ class GuestInfoView extends GetView {
                                         tecLabel: ' FIRST NAME ',
                                         onTap: () {
                                           hc.globalTEC.value = hc.firstName;
+                                          hc.isNumericKeypad.value = false;
+                                          hc.keypadType.value = 'text';
                                         },
+                                        unahangICON: Icon(
+                                          Icons.abc,
+                                          color: HenryColors.puti,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
@@ -157,7 +166,12 @@ class GuestInfoView extends GetView {
                                         tecLabel: ' M.I. ',
                                         onTap: () {
                                           hc.globalTEC.value = hc.middleName;
+                                          hc.keypadType.value = 'text';
                                         },
+                                        unahangICON: Icon(
+                                          Icons.abc,
+                                          color: HenryColors.puti,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -179,9 +193,60 @@ class GuestInfoView extends GetView {
                                         tecLabel: ' LAST NAME ',
                                         onTap: () {
                                           hc.globalTEC.value = hc.lastName;
+                                          hc.keypadType.value = 'text';
                                         },
+                                        unahangICON: Icon(
+                                          Icons.abc,
+                                          color: HenryColors.puti,
+                                        ),
                                       ),
                                     ),
+                                    SizedBox(
+                                      width: 1.w,
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: KioskTextFormField(
+                                        textEditingController: hc.phoneNumber,
+                                        tecLabel: "MOBILE#",
+                                        onTap: () {
+                                          hc.globalTEC.value = hc.phoneNumber;
+                                          // hc.isNumericKeypad.value = true;
+                                          hc.keypadType.value = 'numeric';
+                                        },
+                                        unahangICON: Icon(
+                                          Icons.phone,
+                                          color: HenryColors.puti,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 1.h,
+                                  width: double.infinity,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: KioskTextFormField(
+                                        textEditingController: hc.emailAddress,
+                                        tecLabel: "EMAIL ADDRESS",
+                                        onTap: () {
+                                          hc.globalTEC.value = hc.emailAddress;
+                                          hc.keypadType.value = 'email';
+                                        },
+                                        unahangICON: Icon(
+                                          Icons.alternate_email,
+                                          color: HenryColors.puti,
+                                        ),
+                                      ),
+                                    ),
+                                    // SizedBox(
+                                    //   width: 1.w,
+                                    // ),
                                     Expanded(
                                       flex: 1,
                                       child: Obx(
@@ -198,7 +263,10 @@ class GuestInfoView extends GetView {
                                             icon: const Icon(Icons.done),
                                             label: Text(
                                               'Finish',
-                                              style: TextStyle(color: HenryColors.puti, fontSize: 18.sp),
+                                              style: TextStyle(
+                                                color: HenryColors.puti,
+                                                fontSize: 18.sp,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -215,6 +283,7 @@ class GuestInfoView extends GetView {
                         height: 1.h,
                         width: double.infinity,
                       ),
+                      // CUSTOM KEYBOARD
                       SizedBox(
                         height: 20.h,
                         width: 70.w,
@@ -224,16 +293,38 @@ class GuestInfoView extends GetView {
                             textColor: HenryColors.puti,
                             fontSize: 18.sp,
                             type: VirtualKeyboardType.Custom,
-                            keys: const [
-                              ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "BACKSPACE"],
-                              ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-                              ["z", "x", "c", "v", "b", "n", 'ñ', "m", "."],
-                              ["SPACE"],
-                            ],
-                            alwaysCaps: true,
+                            keys: hc.keypadType.value == "numeric"
+                                ? hc.numericOnly
+                                : hc.keypadType.value == "email"
+                                    ? hc.emailKey
+                                    : hc.customKey,
+                            alwaysCaps: hc.keypadType.value == "email" ? false : true,
                           ),
                         ),
                       ),
+                      // SizedBox(
+                      //   height: 20.h,
+                      //   width: 70.w,
+                      //   child: Obx(
+                      //     () => hc.keypadType.value == "numeric"
+                      //         ? VirtualKeyboard(
+                      //             textController: hc.globalTEC.value,
+                      //             textColor: HenryColors.puti,
+                      //             fontSize: 18.sp,
+                      //             type: VirtualKeyboardType.Custom,
+                      //             keys: hc.numericOnly,
+                      //             alwaysCaps: true,
+                      //           )
+                      //         : VirtualKeyboard(
+                      //             textController: hc.globalTEC.value,
+                      //             textColor: HenryColors.puti,
+                      //             fontSize: 18.sp,
+                      //             type: VirtualKeyboardType.Custom,
+                      //             keys: hc.customKey,
+                      //             alwaysCaps: true,
+                      //           ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

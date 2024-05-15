@@ -44,6 +44,7 @@ class TransactionView extends GetView {
                 Expanded(
                   child: ListView.builder(
                     itemCount: hc.pageList.length,
+                    // padding: const EdgeInsets.all(15),
                     padding: EdgeInsets.only(left: 35.sp, right: 35.sp, top: 10.sp, bottom: 10.sp),
                     itemBuilder: (buildContext, index) {
                       return MenuWidget(

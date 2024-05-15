@@ -11,28 +11,36 @@ String roomTypeModelToJson(List<RoomTypeModel> data) => json.encode(List<dynamic
 
 class RoomTypeModel {
   final int id;
-  final String code;
   final int locationId;
-  String description;
+  final String code;
+  late String description;
+  final bool isActive;
+  final double rate;
 
   RoomTypeModel({
     required this.id,
-    required this.code,
     required this.locationId,
+    required this.code,
     required this.description,
+    required this.isActive,
+    required this.rate,
   });
 
   factory RoomTypeModel.fromJson(Map<String, dynamic> json) => RoomTypeModel(
         id: json["Id"],
-        code: json["code"],
         locationId: json["LocationId"],
+        code: json["code"],
         description: json["description"],
+        isActive: json["isActive"],
+        rate: json["rate"],
       );
 
   Map<String, dynamic> toJson() => {
         "Id": id,
-        "code": code,
         "LocationId": locationId,
+        "code": code,
         "description": description,
+        "isActive": isActive,
+        "rate": rate,
       };
 }

@@ -18,6 +18,9 @@ class RoomTypeView extends GetView {
   RoomTypeView({super.key, required this.titulo});
   @override
   Widget build(BuildContext context) {
+    // final priceFormat = NumberFormat("#,##0.00", "en_PH",);
+    // final pera = NumberFormat.currency(locale: "en_PH", symbol: "P");
+
     return rs.ResponsiveSizer(
       builder: (buildContext, orientation, screenType) {
         return Scaffold(
@@ -55,7 +58,8 @@ class RoomTypeView extends GetView {
                               itemCount: hc.roomTypeList.length,
                               itemBuilder: (context, index) {
                                 return MenuWidget(
-                                  titleName: hc.roomTypeList[index].description,
+                                  titleName:
+                                      '${hc.roomTypeList[index].description} \n${hc.pera.format(hc.roomTypeList[index].rate)}',
                                   imageName: ImageConstant.belajandroICON,
                                   cardColor: HenryColors.teal,
                                   shadowColor: HenryColors.teal.withOpacity(0.5),
@@ -71,9 +75,12 @@ class RoomTypeView extends GetView {
                                       hc.pageTitle.value = 'SELECT NUMBER OF DAYS';
                                     }
                                     await hc.getCamera();
+                                    final buttonText =
+                                        await hc.iTranslate(languageCode: hc.languageCode.value, sourceText: "Agree");
                                     Get.to(
                                       () => NoofdaysView(
                                         tituto: hc.pageTitle.value,
+                                        buttonText: buttonText!,
                                       ),
                                     );
                                   },

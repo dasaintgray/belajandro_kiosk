@@ -153,6 +153,14 @@ class ScreenController extends GetxController with BaseController {
     super.onClose();
   }
 
+  String getDisclaimer(int languageID) {
+    if (languagesList.isNotEmpty) {
+      final result = languagesList.first.data.languages.where((element) => element.id == languageID);
+      return result.first.disclaimer;
+    }
+    return '';
+  }
+
   void startTime() {
     DateTime baseTime = DateTime(
         dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour, dtNow.value.minute, dtNow.value.second);

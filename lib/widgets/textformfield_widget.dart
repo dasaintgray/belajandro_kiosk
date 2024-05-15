@@ -8,6 +8,7 @@ class KioskTextFormField extends StatelessWidget {
   final TextEditingController textEditingController;
   final String tecLabel;
   final int? maxLength;
+  final Widget? unahangICON;
   final Function() onTap;
   // final Function(PointerDownEvent) onTapOutside;
 
@@ -17,6 +18,7 @@ class KioskTextFormField extends StatelessWidget {
     required this.tecLabel,
     // required this.onTapOutside,
     required this.onTap,
+    this.unahangICON,
     this.maxLength,
   });
 
@@ -51,11 +53,12 @@ class KioskTextFormField extends StatelessWidget {
         labelText: tecLabel,
         // helperText: 'Only accept letters from A to Z',
         helperStyle: TextStyle(color: HenryColors.puti, fontSize: 10.sp),
-        prefixIcon: Icon(
-          Icons.person_outline,
-          color: HenryColors.puti,
-          size: 15.sp,
-        ),
+        prefixIcon: unahangICON,
+        // prefixIcon: Icon(
+        //   Icons.person_outline,
+        //   color: HenryColors.puti,
+        //   size: 15.sp,
+        // ),
         labelStyle: TextStyle(
           color: HenryColors.puti,
           fontSize: 12.sp,

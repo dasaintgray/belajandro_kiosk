@@ -62,7 +62,11 @@ class MenuWidget extends StatelessWidget {
                   child: Center(
                     child: Text(
                       titleName!,
-                      style: TextStyle(color: HenryColors.puti, fontSize: 18.sp),
+                      style: TextStyle(
+                        color: HenryColors.puti,
+                        fontSize: 18.sp,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
