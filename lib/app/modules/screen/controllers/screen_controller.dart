@@ -77,6 +77,7 @@ class ScreenController extends GetxController with BaseController {
       windowManager.waitUntilReadyToShow(
         windowOptions,
         () async {
+          // await windowManager.setPosition(const Offset(1080, 1920));
           await windowManager.setAlignment(Alignment.center);
           await windowManager.setFullScreen(true);
           await windowManager.focus();

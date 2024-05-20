@@ -4,6 +4,7 @@ import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/room_type_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/seriesdetails_model.dart';
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/providers/service_providers.dart';
@@ -61,9 +62,19 @@ class ServiceModel {
     }
   }
 
+  // SERIES DETAILS MODEL
+  static Future<List<SeriesDetailsModel>?> getSeriesDetails({required Map<String, dynamic>? docVar}) async {
+    final response = await ServiceProvider.gQLQuery(
+        graphQLURL: GlobalConstant.gqlURL,
+        documents: GQLData.qrySeriesDetails,
+        headers: GlobalConstant.globalHeader,
+        docVar: docVar!);
+    if (response['data']['SeriesDetails'] != null) {
+      return seriesDetailsModelFromJson(jsonEncode(response['data']['SeriesDetails']));
+    } else {
+      return null;
+    }
+  }
 
   // for LANGUAGE
-  
-
-
 } //end of service_model

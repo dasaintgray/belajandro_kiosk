@@ -54,7 +54,7 @@ class GuestInfoView extends GetView {
                   textStyle: titleTextStyle,
                 ),
                 Visibility(
-                  visible: true,
+                  visible: false,
                   child: SizedBox(
                     height: 10.h,
                     width: 35.w,
@@ -256,7 +256,9 @@ class GuestInfoView extends GetView {
                                             onPressed: () {
                                               if (hc.firstName.text.isNotEmpty &&
                                                   hc.lastName.text.isNotEmpty &&
-                                                  hc.middleName.text.isNotEmpty) {
+                                                  hc.middleName.text.isNotEmpty &&
+                                                  hc.phoneNumber.text.isNotEmpty &&
+                                                  hc.emailAddress.text.isNotEmpty) {
                                                 hc.isButtonSubmitReady.value = true;
                                               }
                                             },
@@ -294,7 +296,7 @@ class GuestInfoView extends GetView {
                             fontSize: 18.sp,
                             type: VirtualKeyboardType.Custom,
                             keys: hc.keypadType.value == "numeric"
-                                ? hc.numericOnly
+                                ? hc.numericLamang
                                 : hc.keypadType.value == "email"
                                     ? hc.emailKey
                                     : hc.customKey,
@@ -336,7 +338,20 @@ class GuestInfoView extends GetView {
                       height: 5.h,
                       width: 25.w,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          final result = await hc.addContacts(
+                            prefixID: hc.selectedPrefixID.value,
+                            firstName: hc.firstName.text,
+                            mName: hc.middleName.text,
+                            lastName: hc.lastName.text,
+                            mobileNo: hc.phoneNumber.text,
+                            emailAddress: hc.emailAddress.text,
+                          );
+                          if (result!) {
+                            hc.disposeCamera();
+                            Get.snackbar('Success', result.toString());
+                          }
+                        },
                         autofocus: true,
                         style: ElevatedButton.styleFrom(backgroundColor: HenryColors.teal),
                         child: Text(

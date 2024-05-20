@@ -149,18 +149,39 @@ class GQLData {
   /// MUTATION
   /// --------------------------------------------------------------------------
   ///
-  static String mPeople =
-      r'''mutation addContacts($fn: String!, $mi: String!, $ln: String!, $prefixID: Int!, $cdate: datetime!, $cby: String!) {
-    insert_People(objects: {fName: $fn, mName: $mi, lName: $ln, PrefixId: $prefixID, SuffixId: 1, GenderId: 1, 
-      NationalityId: 77, BloodTypeId: 1, CivilStatusId: 1, CountryId: 1, Discriminator: "Contact", 
-      isBanned: false, 
-      createdBy: $cby, createdDate: $cdate}) {
+  static String mPeople = r'''
+  mutation addContacts($fn: String!, $mi: String!, $ln: String!, $prefixID: Int!, $cdate: datetime!, 
+    $cby: String!, $mobileNo: String!, $email: String!, $code: String!) {
+    insert_People(objects: {fName: $fn, mName: $mi, lName: $ln, PrefixId: $prefixID, SuffixId: 1, 
+      GenderId: 1, NationalityId: 77, BloodTypeId: 1, CivilStatusId: 1, CountryId: 1, Discriminator: "Contact", 
+      isBanned: false, createdBy: $cby, createdDate: $cdate, mobileNo: $mobileNo, email: $email, code: $code}) {
       affected_rows
       returning {
         Id
       }
     }
+  }
+  ''';
+
+  static String mPhotoes = r'''
+  mutation addPhotoes($contactID: Int!, $photo: String!, $createdBy: String!, $createdDate: datetime!) {
+    insert_ContactPhotoes(objects: {ContactId: $contactID, photo: $photo, 
+      isActive: true, createdBy: $createdBy, createdDate: $createdDate}) {
+      affected_rows
+    }
   }''';
+
+  static String mUpdateSeriesDetails = r'''
+mutation updateSeriesDetails($isActive: Boolean!, $modifiedBy: String!, 
+  $modifiedDate: datetime!, $reservationDate: datetime!, $tranDate: datetime!, $seriesID: Int!) {
+  update_SeriesDetails(_set: {isActive: $isActive, modifiedBy: $modifiedBy, modifiedDate: $modifiedDate, 
+    reservationDate: $reservationDate, tranDate: $tranDate}, 
+    where: {Id: {_eq: $seriesID}}) {
+    affected_rows
+  }
+}
+
+  ''';
 
   /// SUBSCRIPTION
   /// --------------------------------------------------------------------------

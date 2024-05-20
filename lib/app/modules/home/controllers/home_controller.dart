@@ -10,9 +10,11 @@ import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/room_type_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/seriesdetails_model.dart';
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
 import 'package:belajandro_kiosk/services/constant/lottie_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
+import 'package:belajandro_kiosk/services/providers/service_providers.dart';
 import 'package:belajandro_kiosk/services/service_model/service_model.dart';
 import 'package:csharp_rpc/csharp_rpc.dart';
 import 'package:ffi/ffi.dart';
@@ -53,6 +55,7 @@ class HomeController extends GetxController {
   final paymentTypeList = <PaymentTypeModel>[];
   final roomTypeList = <RoomTypeModel>[];
   final prefixList = <PrefixModel>[];
+  final seriesDetailsList = <SeriesDetailsModel>[];
 
   final List animationList = [
     LottieConstant.circularProgress,
@@ -71,7 +74,7 @@ class HomeController extends GetxController {
   final emailKey = const [
     ['@', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
     ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "BACKSPACE"],
-    ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+    ["a", "s", "d", "f", "g", "h", "j", "k", "l", "_", "-"],
     ["z", "x", "c", "v", "b", "n", "m", "."],
     ['@gmail.com', '@yahoo.com'],
   ];
@@ -80,6 +83,13 @@ class HomeController extends GetxController {
     ['1', '2', '3', '4'],
     ['5', '6', '7', '8'],
     ['9', '0', '+'],
+  ];
+
+  final numericLamang = const [
+    ['7', '8', '9'],
+    ['4', '5', '6'],
+    ['1', '2', '3'],
+    ['0', '+', 'BACKSPACE']
   ];
 
   // STRING
@@ -120,6 +130,7 @@ class HomeController extends GetxController {
   // final CameraController cameraController = CameraController();
   // final ImagePickerPlatform imagePickerPlatform = ImagePickerPlatform.instance;
   final pera = NumberFormat.currency(locale: "en_PH", symbol: "₱");
+  final orasNgayon = DateTime.now();
 
   // SCROLL CONTROLLER
   final disclaimer = ScrollController();
@@ -181,7 +192,81 @@ class HomeController extends GetxController {
 
   /// TRANSACTION
   /// --------------------------------------------------------------------------
-  Future addTransaction() async {}
+  Future<bool?> addContacts({
+    required int prefixID,
+    required String? firstName,
+    required String? mName,
+    required String? lastName,
+    required String? mobileNo,
+    required String? emailAddress,
+  }) async {
+    // GET THE SERIES DETAILS DATA FIRST
+    final result = await fetchSeriesDetails();
+    if (result!) {
+      // PROCCESS THE contacts
+      // ADDING NEW CONTACTS ON PEOPLE TABLE
+      final Map<String, dynamic> peopleParams = {
+        "fn": firstName,
+        "mi": mName,
+        "ln": lastName,
+        "prefixID": prefixID,
+        "cby": "Kiosk Terminal 1",
+        "cdate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
+        "mobileNo": mobileNo,
+        "email": emailAddress,
+        "code": seriesDetailsList.first.docNo,
+      };
+
+      // var test = jsonEncode(peopleParams);
+      // print(test);
+
+      final response = await ServiceProvider.updateGraphQL(
+          graphQLURL: GlobalConstant.gqlURL,
+          documents: GQLData.mPeople,
+          headers: GlobalConstant.globalHeader,
+          docVar: peopleParams);
+      if (response['data']['insert_People']['affected_rows'] != null) {
+        final peopleID = response['data']['insert_People']['returning'][0]['Id'];
+        // UPDATE SERIES DETAILS
+        // print(peopleID);
+        final larawan = await takePicture(camID: cameraID.value);
+
+        final Map<String, dynamic> contactParams = {
+          "contactID": peopleID,
+          "photo": larawan,
+          "createdBy": "Kiosk Terminal 1",
+          "createdDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
+        };
+        final contactResponse = await ServiceProvider.updateGraphQL(
+          graphQLURL: GlobalConstant.gqlURL,
+          documents: GQLData.mPhotoes,
+          headers: GlobalConstant.globalHeader,
+          docVar: contactParams,
+        );
+        if (contactResponse['data']['insert_ContactPhotoes']['affected_rows'] != null) {
+          // UPDATE THE SERIES DETAILS
+          final Map<String, dynamic> updateParams = {
+            "isActive": false,
+            "modifiedBy": "Kiosk Terminal 1",
+            "modifiedDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
+            "reservationDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
+            "tranDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
+            "seriesID": seriesDetailsList.first.id,
+          };
+          final seriesdetailResponse = await ServiceProvider.updateGraphQL(
+              graphQLURL: GlobalConstant.gqlURL,
+              documents: GQLData.mUpdateSeriesDetails,
+              headers: GlobalConstant.globalHeader,
+              docVar: updateParams);
+          if (seriesdetailResponse['data']['update_SeriesDetails']['affected_rows'] != null) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    return false;
+  }
 
   Future<Map<String, dynamic>> processBonwinCard(
       {required String servicePath, required String command, List<dynamic>? params}) async {
@@ -256,6 +341,22 @@ class HomeController extends GetxController {
           print('Connected SSID: ${ssid ?? 'N/A'}');
         }
       }
+    }
+  }
+
+  // SERIES DETAILS
+  Future<bool?> fetchSeriesDetails() async {
+    final Map<String, dynamic> params = {
+      "moduleID": 5,
+    };
+
+    final response = await ServiceModel.getSeriesDetails(docVar: params);
+    if (response != null) {
+      seriesDetailsList.clear(); //clear first
+      seriesDetailsList.addAll(response);
+      return true;
+    } else {
+      return false;
     }
   }
 
