@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:belajandro_kiosk/app/data/graphql_model/availablerooms_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
@@ -44,7 +45,7 @@ class ServiceModel {
 
   static Future<List<RoomTypeModel>?> getRoomTypes({required String? documents, Map<String, dynamic>? docVar}) async {
     final response = await ServiceProvider.gQLQuery(
-        graphQLURL: GlobalConstant.gqlURL, documents: documents, headers: GlobalConstant.globalHeader);
+        graphQLURL: GlobalConstant.gqlURL, documents: documents, headers: GlobalConstant.globalHeader, docVar: docVar);
     if (response['data']['vRoomTypes'] != null) {
       return roomTypeModelFromJson(jsonEncode(response['data']['vRoomTypes']));
     } else {
@@ -77,10 +78,28 @@ class ServiceModel {
     }
   }
 
+  static Future<List<AvailableRoomsModel>?> getAvailableRooms({required Map<String, int>? params}) async {
+    final response = await ServiceProvider.gQLQuery(
+      graphQLURL: GlobalConstant.gqlURL,
+      documents: GQLData.qryAvailableRooms,
+      headers: GlobalConstant.globalHeader,
+      docVar: params,
+    );
+    if (response['data']['vRoomAvailable'] != null) {
+      return availableRoomsModelFromJson(jsonEncode(response['data']['vRoomAvailable']));
+    } else {
+      return null;
+    }
+  }
+
   // SUBSCRIPTION
-  static Future<Snapshot<dynamic>> getAvailableRoomsSubscription() async {
+  static Future<Snapshot<dynamic>> getAvailableRoomsSubscription({required Map<String, int>? docParams}) async {
     final response = await ServiceProvider.getSubscription(
-        graphQLURL: GlobalConstant.gqlURL, documents: GQLData.sAvailableRooms, headers: GlobalConstant.globalHeader);
+      graphQLURL: GlobalConstant.gqlURL,
+      documents: GQLData.sAvailableRooms,
+      headers: GlobalConstant.globalHeader,
+      docVar: docParams,
+    );
     return response;
   }
 

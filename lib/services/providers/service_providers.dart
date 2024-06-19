@@ -10,9 +10,9 @@ class ServiceProvider extends BaseController {
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 
-    final response = docVar != null
-        ? await hasuraConnect.query(documents!, variables: docVar)
-        : await hasuraConnect.query(documents!);
+    final response = docVar == null
+        ? await hasuraConnect.query(documents!)
+        : await hasuraConnect.query(documents!, variables: docVar);
     if (response != null) {
       return response!;
     } else {
@@ -28,9 +28,9 @@ class ServiceProvider extends BaseController {
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 
-    final eventResponse = docVar != null
-        ? await hasuraConnect.subscription(documents!, variables: docVar)
-        : await hasuraConnect.subscription(documents!);
+    final eventResponse = docVar == null
+        ? await hasuraConnect.subscription(documents!)
+        : await hasuraConnect.subscription(documents!, variables: docVar);
     return eventResponse;
   }
 
@@ -42,9 +42,9 @@ class ServiceProvider extends BaseController {
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 
-    final updateResponse = docVar != null
-        ? await hasuraConnect.mutation(documents!, variables: docVar)
-        : await hasuraConnect.mutation(documents!);
+    final updateResponse = docVar == null
+        ? await hasuraConnect.mutation(documents!)
+        : await hasuraConnect.mutation(documents!, variables: docVar);
     if (updateResponse != null) {
       return updateResponse!;
     } else {

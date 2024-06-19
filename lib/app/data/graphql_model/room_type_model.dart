@@ -13,7 +13,7 @@ class RoomTypeModel {
   final int id;
   final String code;
   final int locationId;
-  late final String description;
+  String description;
   final Available available;
 
   RoomTypeModel({

@@ -51,6 +51,7 @@ class HomeController extends GetxController {
   final selectedPrefixID = 1.obs;
   final noofdays = 0.obs;
   final agentID = 2.obs;
+  final iAgentTypeID = 2.obs;
 
   // LIST
   final menuList = <MenuModel>[];
@@ -148,7 +149,7 @@ class HomeController extends GetxController {
     super.onInit();
     await fetchMenu(langID: 1);
     await fetchPrefix();
-    await fetchAvailableRooms();
+    // await fetchAvailableRooms();
   }
 
   @override
@@ -432,8 +433,28 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<dynamic> fetchAvailableRooms() async {
-    final availRoomSnapshot = await ServiceModel.getAvailableRoomsSubscription();
+  Future<bool?> getRoomAvailableRooms({required int? agentID, required int? roomTypeID}) async {
+    final Map<String, int> params = {
+      "AgentTypdID": agentID!,
+      "roomTypeID": roomTypeID!,
+    };
+    final response = await ServiceModel.getAvailableRooms(params: params);
+    if (response != null) {
+      availableRoomList.clear();
+      availableRoomList.addAll(response);
+      return true;
+    } else {
+      availableRoomList.clear();
+      return false;
+    }
+  }
+
+  Future<dynamic> fetchAvailableRooms({required int? agentID, required int? roomTypeID}) async {
+    final Map<String, int> params = {
+      "AgentTypdID": agentID!,
+      "roomTypeID": roomTypeID!,
+    };
+    final availRoomSnapshot = await ServiceModel.getAvailableRoomsSubscription(docParams: params);
 
     // LISTEN ON SNAPSHOT
     availRoomSnapshot.listen((event) {

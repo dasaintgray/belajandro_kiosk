@@ -18,6 +18,7 @@ class AvailableRoomsModel {
   final String lockCode;
   final int bed;
   final int roomTypeId;
+  final String roomType;
 
   AvailableRoomsModel({
     required this.id,
@@ -27,6 +28,7 @@ class AvailableRoomsModel {
     required this.lockCode,
     required this.bed,
     required this.roomTypeId,
+    required this.roomType,
   });
 
   factory AvailableRoomsModel.fromJson(Map<String, dynamic> json) => AvailableRoomsModel(
@@ -36,7 +38,8 @@ class AvailableRoomsModel {
         rate: json["rate"],
         lockCode: json["lockCode"],
         bed: json["bed"],
-        roomTypeId: json["roomTypeId"],
+        roomTypeId: json["RoomTypeId"],
+        roomType: json["roomType"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -46,6 +49,7 @@ class AvailableRoomsModel {
         "rate": rate,
         "lockCode": lockCode,
         "bed": bed,
-        "roomTypeId": roomTypeId,
+        "RoomTypeId": roomTypeId,
+        "roomType": roomType,
       };
 }

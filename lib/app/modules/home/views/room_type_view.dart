@@ -1,5 +1,5 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
-import 'package:belajandro_kiosk/app/modules/home/views/noofdays_view.dart';
+import 'package:belajandro_kiosk/app/modules/home/views/room_number_view.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
@@ -58,7 +58,8 @@ class RoomTypeView extends GetView {
                               itemCount: hc.roomTypeList.length,
                               itemBuilder: (context, index) {
                                 return MenuWidget(
-                                  titleName: '${hc.roomTypeList[index].description})}',
+                                  titleName:
+                                      '${hc.roomTypeList[index].description}\nTotal Rooms: ${hc.roomTypeList[index].available.total.count}',
                                   imageName: ImageConstant.belajandroICON,
                                   cardColor: HenryColors.teal,
                                   shadowColor: HenryColors.teal.withOpacity(0.5),
@@ -67,21 +68,35 @@ class RoomTypeView extends GetView {
                                     hc.selectedRoomType.value = hc.roomTypeList[index].id;
                                     if (hc.languageID.value != 1) {
                                       hc.pageTitle.value = (await hc.iTranslate(
-                                          languageCode: hc.languageCode.value, sourceText: 'SELECT NUMBER OF DAYS'))!;
+                                          languageCode: hc.languageCode.value,
+                                          sourceText:
+                                              'SELECT ROOM FOR-${hc.roomTypeList[index].description}'.toUpperCase()))!;
                                       hc.isLoading.value = false;
                                     } else {
                                       hc.isLoading.value = false;
-                                      hc.pageTitle.value = 'SELECT NUMBER OF DAYS';
+                                      hc.pageTitle.value =
+                                          'SELECT ROOM FOR-${hc.roomTypeList[index].description}'.toUpperCase();
                                     }
-                                    await hc.getCamera();
-                                    final buttonText =
-                                        await hc.iTranslate(languageCode: hc.languageCode.value, sourceText: "Agree");
-                                    Get.to(
-                                      () => NoofdaysView(
-                                        tituto: hc.pageTitle.value,
-                                        buttonText: buttonText!,
-                                      ),
-                                    );
+                                    // await hc.getCamera();
+                                    // final buttonText =
+                                    //     await hc.iTranslate(languageCode: hc.languageCode.value, sourceText: "Agree");
+                                    // await hc.fetchAvailableRooms(
+                                    //     agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
+                                    final response = await hc.getRoomAvailableRooms(
+                                        agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
+                                    if (response!) {
+                                      Get.to(
+                                        () => RoomNumberView(
+                                          titulo: hc.pageTitle.value,
+                                        ),
+                                      );
+                                    }
+                                    // Get.to(
+                                    //   () => NoofdaysView(
+                                    //     tituto: hc.pageTitle.value,
+                                    //     buttonText: buttonText!,
+                                    //   ),
+                                    // );
                                   },
                                 );
                               },

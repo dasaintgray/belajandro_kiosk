@@ -72,7 +72,7 @@ class CiprocessView extends GetView {
                                       case 1: //walkin
                                         hc.isLoading.value = true;
                                         final response = await hc.fetchRoomTypes(
-                                            langCode: hc.languageCode.value, agentID: sc.iAgentID.value);
+                                            langCode: hc.languageCode.value, agentID: sc.iAgentTypeID.value);
                                         if (hc.languageID.value != 1) {
                                           hc.pageTitle.value = (await hc.iTranslate(
                                               languageCode: hc.languageCode.value, sourceText: 'SELECT ROOM TYPE'))!;

@@ -100,7 +100,7 @@ class GQLData {
   ''';
 
   static String qryAvailableRooms = r'''
-  query getRoomAvailable($AgentTypdID: Int!, $roomTypeID: Int!) {
+	query getRoomAvailable($AgentTypdID: Int!, $roomTypeID: Int!) {
     vRoomAvailable(where: {isActive: {_eq: true}, isHidden: {_eq: false}, AgentId: {_eq: $AgentTypdID}, RoomTypeId: {_eq: $roomTypeID}}) {
       Id
       code

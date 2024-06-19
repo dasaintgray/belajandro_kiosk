@@ -24,6 +24,7 @@ class HomeView extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return rs.ResponsiveSizer(
       builder: (buildContext, orientation, screenType) {
+        hc.iAgentTypeID.value = sc.iAgentTypeID.value;
         return Scaffold(
           body: Container(
             height: 100.h,
