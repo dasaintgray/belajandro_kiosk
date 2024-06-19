@@ -66,14 +66,17 @@ class GQLData {
   ''';
 
   static String qRoomType = r'''
-  query getRoomTypes {
-    vRoomTypes(where: {isActive: {_eq: true}}) {
+  query getRoomTypes($agentID: Int!) {
+    vRoomTypes {
       Id
-      LocationId
       code
+      LocationId
       description
-      isActive
-      rate
+      available: vrtrs_aggregate(where: {AgentId: {_eq: $agentID}, isActive: {_eq: true}, isHidden: {_eq: false}}) {
+        total: aggregate {
+          count(distinct: true)
+        }
+      }
     }
   }
   ''';
@@ -97,20 +100,18 @@ class GQLData {
   ''';
 
   static String qryAvailableRooms = r'''
-    query getRoomAvailable($agentID: Int!, $accommodationTypeID: Int!, $roomTypeID: Int!, $bed: Int!) {
-      vRoomAvailable(where: {AgentId: {_eq: $agentID}, 
-        _and: {AccommodationTypeId: {_eq: $accommodationTypeID}, 
-        _and: {RoomTypeId: {_eq: $roomTypeID}, 
-        _and: {isActive: {_eq: true}, 
-        _and: {isHidden: {_eq: false}}}, bed: {_gte: $bed}}}}) {
-        id
-        code
-        description
-        rate
-        lockCode
-        bed
-      }
+  query getRoomAvailable($AgentTypdID: Int!, $roomTypeID: Int!) {
+    vRoomAvailable(where: {isActive: {_eq: true}, isHidden: {_eq: false}, AgentId: {_eq: $AgentTypdID}, RoomTypeId: {_eq: $roomTypeID}}) {
+      Id
+      code
+      description
+      rate
+      lockCode
+      bed
+      RoomTypeId
+      roomType
     }
+  }
   ''';
 
   static String qryLanguages = r'''query getLanguages @cached {
@@ -172,33 +173,30 @@ class GQLData {
   }''';
 
   static String mUpdateSeriesDetails = r'''
-mutation updateSeriesDetails($isActive: Boolean!, $modifiedBy: String!, 
-  $modifiedDate: datetime!, $reservationDate: datetime!, $tranDate: datetime!, $seriesID: Int!) {
-  update_SeriesDetails(_set: {isActive: $isActive, modifiedBy: $modifiedBy, modifiedDate: $modifiedDate, 
-    reservationDate: $reservationDate, tranDate: $tranDate}, 
-    where: {Id: {_eq: $seriesID}}) {
-    affected_rows
+  mutation updateSeriesDetails($isActive: Boolean!, $modifiedBy: String!, 
+    $modifiedDate: datetime!, $reservationDate: datetime!, $tranDate: datetime!, $seriesID: Int!) {
+    update_SeriesDetails(_set: {isActive: $isActive, modifiedBy: $modifiedBy, modifiedDate: $modifiedDate, 
+      reservationDate: $reservationDate, tranDate: $tranDate}, 
+      where: {Id: {_eq: $seriesID}}) {
+      affected_rows
+    }
   }
-}
-
   ''';
 
   /// SUBSCRIPTION
   /// --------------------------------------------------------------------------
   static String sAvailableRooms = r'''
-    subscription getRoomAvailable($agentID: Int!, $accommodationTypeID: Int!, $roomTypeID: Int!, $bed: Int!) {
-      vRoomAvailable(where: {AgentId: {_eq: $agentID}, 
-        _and: {AccommodationTypeId: {_eq: $accommodationTypeID}, 
-        _and: {RoomTypeId: {_eq: $roomTypeID}, 
-        _and: {isActive: {_eq: true}, 
-        _and: {isHidden: {_eq: false}}}, bed: {_gte: $bed}}}}) {
-        id
-        code
-        description
-        rate
-        lockCode
-        bed
-      }
+  subscription subsRoomAvailable($AgentTypdID: Int!, $roomTypeID: Int!) {
+    vRoomAvailable(where: {isActive: {_eq: true}, isHidden: {_eq: false}, AgentId: {_eq: $AgentTypdID}, RoomTypeId: {_eq: $roomTypeID}}) {
+      Id
+      code
+      description
+      rate
+      lockCode
+      bed
+      RoomTypeId
+      roomType
     }
+  }
   ''';
 }

@@ -11,36 +11,64 @@ String roomTypeModelToJson(List<RoomTypeModel> data) => json.encode(List<dynamic
 
 class RoomTypeModel {
   final int id;
-  final int locationId;
   final String code;
-  late String description;
-  final bool isActive;
-  final double rate;
+  final int locationId;
+  late final String description;
+  final Available available;
 
   RoomTypeModel({
     required this.id,
-    required this.locationId,
     required this.code,
+    required this.locationId,
     required this.description,
-    required this.isActive,
-    required this.rate,
+    required this.available,
   });
 
   factory RoomTypeModel.fromJson(Map<String, dynamic> json) => RoomTypeModel(
         id: json["Id"],
-        locationId: json["LocationId"],
         code: json["code"],
+        locationId: json["LocationId"],
         description: json["description"],
-        isActive: json["isActive"],
-        rate: json["rate"],
+        available: Available.fromJson(json["available"]),
       );
 
   Map<String, dynamic> toJson() => {
         "Id": id,
-        "LocationId": locationId,
         "code": code,
+        "LocationId": locationId,
         "description": description,
-        "isActive": isActive,
-        "rate": rate,
+        "available": available.toJson(),
+      };
+}
+
+class Available {
+  final Total total;
+
+  Available({
+    required this.total,
+  });
+
+  factory Available.fromJson(Map<String, dynamic> json) => Available(
+        total: Total.fromJson(json["total"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "total": total.toJson(),
+      };
+}
+
+class Total {
+  final int count;
+
+  Total({
+    required this.count,
+  });
+
+  factory Total.fromJson(Map<String, dynamic> json) => Total(
+        count: json["count"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "count": count,
       };
 }

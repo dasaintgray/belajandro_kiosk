@@ -8,6 +8,7 @@ import 'package:belajandro_kiosk/app/data/graphql_model/seriesdetails_model.dart
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/providers/service_providers.dart';
+import 'package:hasura_connect/hasura_connect.dart';
 
 class ServiceModel {
   /// ==========================================================================
@@ -74,6 +75,13 @@ class ServiceModel {
     } else {
       return null;
     }
+  }
+
+  // SUBSCRIPTION
+  static Future<Snapshot<dynamic>> getAvailableRoomsSubscription() async {
+    final response = await ServiceProvider.getSubscription(
+        graphQLURL: GlobalConstant.gqlURL, documents: GQLData.sAvailableRooms, headers: GlobalConstant.globalHeader);
+    return response;
   }
 
   // for LANGUAGE

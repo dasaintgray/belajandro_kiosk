@@ -58,8 +58,7 @@ class RoomTypeView extends GetView {
                               itemCount: hc.roomTypeList.length,
                               itemBuilder: (context, index) {
                                 return MenuWidget(
-                                  titleName:
-                                      '${hc.roomTypeList[index].description} \n${hc.pera.format(hc.roomTypeList[index].rate)}',
+                                  titleName: '${hc.roomTypeList[index].description})}',
                                   imageName: ImageConstant.belajandroICON,
                                   cardColor: HenryColors.teal,
                                   shadowColor: HenryColors.teal.withOpacity(0.5),

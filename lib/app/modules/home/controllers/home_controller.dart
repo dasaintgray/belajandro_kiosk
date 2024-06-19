@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ffi' as ffi;
 
+import 'package:belajandro_kiosk/app/data/graphql_model/availablerooms_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
@@ -18,11 +19,13 @@ import 'package:belajandro_kiosk/services/providers/service_providers.dart';
 import 'package:belajandro_kiosk/services/service_model/service_model.dart';
 import 'package:csharp_rpc/csharp_rpc.dart';
 import 'package:ffi/ffi.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:hasura_connect/hasura_connect.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:translator/translator.dart' as tagasalin;
@@ -47,6 +50,7 @@ class HomeController extends GetxController {
   final selectedPaymentType = 0.obs; //cash
   final selectedPrefixID = 1.obs;
   final noofdays = 0.obs;
+  final agentID = 2.obs;
 
   // LIST
   final menuList = <MenuModel>[];
@@ -56,6 +60,7 @@ class HomeController extends GetxController {
   final roomTypeList = <RoomTypeModel>[];
   final prefixList = <PrefixModel>[];
   final seriesDetailsList = <SeriesDetailsModel>[];
+  final availableRoomList = <AvailableRoomsModel>[];
 
   final List animationList = [
     LottieConstant.circularProgress,
@@ -135,11 +140,15 @@ class HomeController extends GetxController {
   // SCROLL CONTROLLER
   final disclaimer = ScrollController();
 
+  // SNAPSHOT DATA
+  late final Snapshot availRoomSnapshot;
+
   @override
   void onInit() async {
     super.onInit();
     await fetchMenu(langID: 1);
     await fetchPrefix();
+    await fetchAvailableRooms();
   }
 
   @override
@@ -148,12 +157,12 @@ class HomeController extends GetxController {
 
     // checkBonwin(30);
 
-    final test = NetworkInformation.getConnectionProfiles();
-    final test1 = NetworkInformation.getHostNames();
-    if (kDebugMode) {
-      print(test);
-      print(test1);
-    }
+    // final test = NetworkInformation.getConnectionProfiles();
+    // final test1 = NetworkInformation.getHostNames();
+    // if (kDebugMode) {
+    //   print(test);
+    //   print(test1);
+    // }
 
     // // CHECK RPC SERVICE
     // final rpcService = await CsharpRpc('assets/service/bonwin/BonwinService.exe').start();
@@ -268,7 +277,7 @@ class HomeController extends GetxController {
     return false;
   }
 
-  Future<Map<String, dynamic>> processBonwinCard(
+  Future<Map<String, dynamic>?> processBonwinCard(
       {required String servicePath, required String command, List<dynamic>? params}) async {
     late final Map<String, dynamic> response;
 
@@ -285,8 +294,11 @@ class HomeController extends GetxController {
       case "revoke":
         response = await rpcservice.invoke<Map<String, dynamic>>(method: "DisableCard").timeout(15.seconds);
     }
-    rpcservice.dispose(); //shutdown the service
-    return response;
+    if (response["success"]) {
+      rpcservice.dispose(); //shutdown the service
+      return response;
+    }
+    return null;
   }
 
   void keyboardListeners() {
@@ -390,8 +402,10 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<bool?> fetchRoomTypes({required String? langCode}) async {
-    final response = await ServiceModel.getRoomTypes(documents: GQLData.qRoomType);
+  Future<bool?> fetchRoomTypes({required String? langCode, required int? agentID}) async {
+    final Map<String, dynamic> param = {"agentID": agentID ??= 2};
+
+    final response = await ServiceModel.getRoomTypes(documents: GQLData.qRoomType, docVar: param);
     if (response != null) {
       if (languageID.value > 1) {
         for (var i = 0; i < response.length; i++) {
@@ -416,6 +430,19 @@ class HomeController extends GetxController {
     } else {
       return false;
     }
+  }
+
+  Future<dynamic> fetchAvailableRooms() async {
+    final availRoomSnapshot = await ServiceModel.getAvailableRoomsSubscription();
+
+    // LISTEN ON SNAPSHOT
+    availRoomSnapshot.listen((event) {
+      final eventResponse = availableRoomsModelFromJson(jsonEncode(event['data']['vRoomAvailable']));
+      if (eventResponse.isNotEmpty) {
+        availableRoomList.clear();
+        availableRoomList.addAll(eventResponse);
+      }
+    });
   }
 
   bool makeMenu({required int? languageID, required String? code, String? type}) {

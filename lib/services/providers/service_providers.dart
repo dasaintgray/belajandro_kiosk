@@ -42,9 +42,9 @@ class ServiceProvider extends BaseController {
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 
-    final updateResponse = docVar == null
-        ? await hasuraConnect.mutation(documents!)
-        : await hasuraConnect.mutation(documents!, variables: docVar);
+    final updateResponse = docVar != null
+        ? await hasuraConnect.mutation(documents!, variables: docVar)
+        : await hasuraConnect.mutation(documents!);
     if (updateResponse != null) {
       return updateResponse!;
     } else {

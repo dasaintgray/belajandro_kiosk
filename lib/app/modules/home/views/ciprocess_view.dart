@@ -1,5 +1,6 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
 import 'package:belajandro_kiosk/app/modules/home/views/room_type_view.dart';
+import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
@@ -15,6 +16,7 @@ import 'package:get/get.dart';
 class CiprocessView extends GetView {
   // call the controller
   final hc = Get.find<HomeController>();
+  final sc = Get.find<ScreenController>();
 
   CiprocessView({super.key});
 
@@ -69,7 +71,8 @@ class CiprocessView extends GetView {
                                         break;
                                       case 1: //walkin
                                         hc.isLoading.value = true;
-                                        final response = await hc.fetchRoomTypes(langCode: hc.languageCode.value);
+                                        final response = await hc.fetchRoomTypes(
+                                            langCode: hc.languageCode.value, agentID: sc.iAgentID.value);
                                         if (hc.languageID.value != 1) {
                                           hc.pageTitle.value = (await hc.iTranslate(
                                               languageCode: hc.languageCode.value, sourceText: 'SELECT ROOM TYPE'))!;

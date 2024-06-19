@@ -43,6 +43,7 @@ class ScreenController extends GetxController with BaseController {
 
   // integer
   final tempC = 0.obs;
+  final iAgentID = 2.obs;
 
   // LIST
   final List cities = [
@@ -101,6 +102,9 @@ class ScreenController extends GetxController with BaseController {
       final r2Result = settingsList.first.data.settings.indexWhere((element) => element.code == 'R2');
       sCOMPANY.value = settingsList.first.data.settings[r1Result].value;
       sCompanyAddress.value = settingsList.first.data.settings[r2Result].value;
+
+      final agentData = settingsList.first.data.settings.where((element) => element.code == 'AGENTID');
+      iAgentID.value = int.parse(agentData.first.value);
 
       final response = await getWeather(sCITY.value);
       if (response) {
