@@ -199,4 +199,23 @@ class GQLData {
     }
   }
   ''';
+
+  static String sRoomTypes = r'''
+  subscription subsRoomTypes($agentID: Int!) {
+    vRoomTypes {
+      Id
+      code
+      LocationId
+      description
+      price: vrtrs(where: {AgentId: {_eq: $agentID}, isActive: {_eq: true}, isHidden: {_eq: false}}, limit: 1) {
+        rate
+      }
+      available: vrtrs_aggregate(where: {AgentId: {_eq: $agentID}, isActive: {_eq: true}, isHidden: {_eq: false}}) {
+        total: aggregate {
+          count(distinct: true)
+        }
+      }
+    }
+  }
+  ''';
 }

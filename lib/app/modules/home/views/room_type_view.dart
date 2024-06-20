@@ -1,13 +1,13 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
-import 'package:belajandro_kiosk/app/modules/home/views/room_number_view.dart';
+import 'package:belajandro_kiosk/app/modules/home/views/noofdays_view.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
 import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/loading_widget.dart';
-import 'package:belajandro_kiosk/widgets/menu_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
 import 'package:get/get.dart';
@@ -18,6 +18,7 @@ class RoomTypeView extends GetView {
   RoomTypeView({super.key, required this.titulo});
   @override
   Widget build(BuildContext context) {
+    // GALING NG CHECK IN PROCESS VIEW
     // final priceFormat = NumberFormat("#,##0.00", "en_PH",);
     // final pera = NumberFormat.currency(locale: "en_PH", symbol: "P");
 
@@ -55,50 +56,133 @@ class RoomTypeView extends GetView {
                               lottieFiles: hc.generateLotties(),
                             )
                           : ListView.builder(
-                              itemCount: hc.roomTypeList.length,
+                              itemCount: hc.reactiveRoomTypeList.length,
                               itemBuilder: (context, index) {
-                                return MenuWidget(
-                                  titleName:
-                                      '${hc.roomTypeList[index].description}\nTotal Rooms: ${hc.roomTypeList[index].available.total.count}',
-                                  imageName: ImageConstant.belajandroICON,
-                                  cardColor: HenryColors.teal,
-                                  shadowColor: HenryColors.teal.withOpacity(0.5),
-                                  onTap: () async {
-                                    hc.isLoading.value = true;
-                                    hc.selectedRoomType.value = hc.roomTypeList[index].id;
-                                    if (hc.languageID.value != 1) {
-                                      hc.pageTitle.value = (await hc.iTranslate(
-                                          languageCode: hc.languageCode.value,
-                                          sourceText:
-                                              'SELECT ROOM FOR-${hc.roomTypeList[index].description}'.toUpperCase()))!;
-                                      hc.isLoading.value = false;
-                                    } else {
-                                      hc.isLoading.value = false;
-                                      hc.pageTitle.value =
-                                          'SELECT ROOM FOR-${hc.roomTypeList[index].description}'.toUpperCase();
-                                    }
-                                    // await hc.getCamera();
-                                    // final buttonText =
-                                    //     await hc.iTranslate(languageCode: hc.languageCode.value, sourceText: "Agree");
-                                    // await hc.fetchAvailableRooms(
-                                    //     agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
-                                    final response = await hc.getRoomAvailableRooms(
-                                        agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
-                                    if (response!) {
-                                      Get.to(
-                                        () => RoomNumberView(
-                                          titulo: hc.pageTitle.value,
+                                return Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          // color: HenryColors.teal.withOpacity(.5),
+                                          color: HenryColors.teal.withOpacity(0.5),
+                                          blurRadius: 8.0, // soften the shadow
+                                          spreadRadius: 0.0, //extend the shadow
+                                          offset: const Offset(
+                                            5.0, // Move to right 10  horizontally
+                                            5.0, // Move to bottom 10 Vertically
+                                          ),
+                                        )
+                                      ],
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Card(
+                                      color: HenryColors.teal,
+                                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.night_shelter_rounded,
+                                          color: HenryColors.puti,
+                                          size: 18.sp,
                                         ),
-                                      );
-                                    }
-                                    // Get.to(
-                                    //   () => NoofdaysView(
-                                    //     tituto: hc.pageTitle.value,
-                                    //     buttonText: buttonText!,
-                                    //   ),
-                                    // );
-                                  },
+                                        title: Text(
+                                          hc.reactiveRoomTypeList[index].description,
+                                          style: TextStyle(
+                                            color: HenryColors.puti,
+                                            fontSize: 18.sp,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          hc.pera.format(hc.reactiveRoomTypeList[index].price.first.rate),
+                                          style: TextStyle(
+                                            color: HenryColors.puti,
+                                            fontSize: 13.sp,
+                                          ),
+                                        ),
+                                        trailing: CircleAvatar(
+                                          minRadius: 30,
+                                          maxRadius: 40,
+                                          backgroundColor: HenryColors.puti,
+                                          child: Text(
+                                            '${hc.reactiveRoomTypeList[index].available.total.count}',
+                                            style: TextStyle(
+                                              color: HenryColors.teal,
+                                              fontSize: 15.sp,
+                                            ),
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          hc.isLoading.value = true;
+                                          hc.selectedRoomType.value = hc.reactiveRoomTypeList[index].id;
+                                          if (hc.languageID.value != 1) {
+                                            hc.pageTitle.value = (await hc.iTranslate(
+                                                languageCode: hc.languageCode.value,
+                                                sourceText: 'SELECT NUMBER OF DAYS'))!;
+                                            hc.isLoading.value = false;
+                                          } else {
+                                            hc.isLoading.value = false;
+                                            hc.pageTitle.value = 'SELECT NUMBER OF DAYS';
+                                          }
+                                          await hc.getCamera();
+                                          final buttonText = await hc.iTranslate(
+                                              languageCode: hc.languageCode.value, sourceText: "Agree");
+                                          hc.isLoading.value = true;
+                                          await hc.fetchAvailableRooms(
+                                              agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
+
+                                          Get.to(
+                                            () => NoofdaysView(
+                                              tituto: hc.pageTitle.value,
+                                              buttonText: buttonText!,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ).animate().flip(delay: 300.ms, duration: 500.ms).shimmer(duration: 300.ms),
                                 );
+                                //return MenuWidget(
+                                //   titleName:
+                                //       '${hc.reactiveRoomTypeList[index].description}\nTotal Rooms: ${hc.reactiveRoomTypeList[index].available.total.count}',
+                                //   imageName: ImageConstant.belajandroICON,
+                                //   cardColor: HenryColors.teal,
+                                //   shadowColor: HenryColors.teal.withOpacity(0.5),
+                                //   onTap: () async {
+                                //     hc.isLoading.value = true;
+                                //     hc.selectedRoomType.value = hc.roomTypeList[index].id;
+                                //     if (hc.languageID.value != 1) {
+                                //       hc.pageTitle.value = (await hc.iTranslate(
+                                //           languageCode: hc.languageCode.value, sourceText: 'SELECT ROOM NUMBER'))!;
+                                //       hc.isLoading.value = false;
+                                //     } else {
+                                //       hc.isLoading.value = false;
+                                //       hc.pageTitle.value = 'SELECT ROOM NUMBER';
+                                //     }
+                                //     await hc.getCamera();
+                                //     final buttonText =
+                                //         await hc.iTranslate(languageCode: hc.languageCode.value, sourceText: "Agree");
+                                //     await hc.fetchAvailableRooms(
+                                //         agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
+
+                                //     Get.to(
+                                //       () => NoofdaysView(
+                                //         tituto: hc.pageTitle.value,
+                                //         buttonText: buttonText!,
+                                //       ),
+                                //     );
+
+                                //     // final response = await hc.getRoomAvailableRooms(
+                                //     //     agentID: hc.iAgentTypeID.value, roomTypeID: hc.selectedRoomType.value);
+                                //     // if (response!) {
+                                //     //   Get.to(
+                                //     //     () => RoomNumberView(
+                                //     //       titulo: hc.pageTitle.value,
+                                //     //     ),
+                                //     //   );
+                                //     // }
+                                //   },
+                                // );
                               },
                             ),
                     ),

@@ -10,6 +10,7 @@ import 'package:belajandro_kiosk/app/data/graphql_model/availablerooms_model.dar
 import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/reactive_room_types_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/room_type_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/seriesdetails_model.dart';
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
@@ -53,12 +54,17 @@ class HomeController extends GetxController {
   final agentID = 2.obs;
   final iAgentTypeID = 2.obs;
 
+  // STRING
+  final selectedRooNumber = ''.obs;
+  final selectedLockCode = ''.obs;
+
   // LIST
   final menuList = <MenuModel>[];
   final pageList = <Menu>[].obs;
   final titleList = <Menu>[].obs;
   final paymentTypeList = <PaymentTypeModel>[];
   final roomTypeList = <RoomTypeModel>[];
+  final reactiveRoomTypeList = <ReactiveRoomTypesModel>[].obs;
   final prefixList = <PrefixModel>[];
   final seriesDetailsList = <SeriesDetailsModel>[];
   final availableRoomList = <AvailableRoomsModel>[];
@@ -135,7 +141,7 @@ class HomeController extends GetxController {
 
   // final CameraController cameraController = CameraController();
   // final ImagePickerPlatform imagePickerPlatform = ImagePickerPlatform.instance;
-  final pera = NumberFormat.currency(locale: "en_PH", symbol: "₱");
+  final pera = NumberFormat.currency(locale: "en_PH", symbol: "₱", decimalDigits: 0);
   final orasNgayon = DateTime.now();
 
   // SCROLL CONTROLLER
@@ -449,6 +455,21 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<dynamic> fetchReactiveRoomType({required String? langCode, required int? agentID}) async {
+    final Map<String, int> param = {"agentID": agentID ??= 2};
+    final roomTypeResponse = await ServiceModel.getReactiveRoomTypes(docParams: param);
+
+    roomTypeResponse.listen((event) {
+      final eventResponse = reactiveRoomTypesModelFromJson(jsonEncode(event['data']['vRoomTypes']));
+      if (eventResponse.isNotEmpty) {
+        reactiveRoomTypeList.clear();
+        reactiveRoomTypeList.addAll(eventResponse);
+        // print('DUMAAN DITO YUNG REACTIVE');
+        isLoading.value = false;
+      }
+    });
+  }
+
   Future<dynamic> fetchAvailableRooms({required int? agentID, required int? roomTypeID}) async {
     final Map<String, int> params = {
       "AgentTypdID": agentID!,
@@ -462,6 +483,7 @@ class HomeController extends GetxController {
       if (eventResponse.isNotEmpty) {
         availableRoomList.clear();
         availableRoomList.addAll(eventResponse);
+        isLoading.value = false;
       }
     });
   }
@@ -797,6 +819,13 @@ class HomeController extends GetxController {
 
   String generateLotties() {
     return animationList[Random().nextInt(animationList.length)];
+  }
+
+  (String? roomNo, String? lockCode, double? rate) getRandromRoomNumber() {
+    final resultCode = availableRoomList[Random().nextInt(availableRoomList.length)].code;
+    final result = availableRoomList.where((element) => element.code == resultCode);
+
+    return (result.first.description, result.first.lockCode, result.first.rate);
   }
 
   void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {

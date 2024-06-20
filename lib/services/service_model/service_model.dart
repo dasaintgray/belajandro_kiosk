@@ -103,5 +103,15 @@ class ServiceModel {
     return response;
   }
 
+  static Future<Snapshot> getReactiveRoomTypes({required Map<String, int>? docParams}) async {
+    final response = await ServiceProvider.getSubscription(
+      graphQLURL: GlobalConstant.gqlURL,
+      documents: GQLData.sRoomTypes,
+      headers: GlobalConstant.globalHeader,
+      docVar: docParams,
+    );
+    return response;
+  }
+
   // for LANGUAGE
 } //end of service_model

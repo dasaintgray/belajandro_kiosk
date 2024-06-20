@@ -6,7 +6,6 @@ import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/loading_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
@@ -55,9 +54,33 @@ class RoomNumberView extends GetView {
                           : SizedBox(
                               child: Column(
                                 children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Text(
+                                        hc.availableRoomList.first.roomType,
+                                        style: TextStyle(
+                                          color: HenryColors.puti,
+                                          fontSize: 18.sp,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${hc.availableRoomList.length} rooms',
+                                        style: TextStyle(
+                                          color: HenryColors.puti,
+                                          fontSize: 18.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   SizedBox(
                                     height: 30.sp,
                                     child: ListTile(
+                                      leading: Icon(
+                                        Icons.nightlight_round,
+                                        color: HenryColors.puti,
+                                        size: 20.sp,
+                                      ),
                                       title: Center(
                                         child: Text(
                                           hc.pera.format(hc.availableRoomList.first.rate),
@@ -66,6 +89,11 @@ class RoomNumberView extends GetView {
                                             fontSize: 20.sp,
                                           ),
                                         ),
+                                      ),
+                                      trailing: Icon(
+                                        Icons.night_shelter,
+                                        color: HenryColors.puti,
+                                        size: 21.sp,
                                       ),
                                     ),
                                   ),
@@ -85,6 +113,15 @@ class RoomNumberView extends GetView {
                                               style: TextStyle(
                                                 color: HenryColors.puti,
                                                 fontSize: 18.sp,
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              hc.availableRoomList[index].bed == 1
+                                                  ? '${hc.availableRoomList[index].bed} bed'
+                                                  : '${hc.availableRoomList[index].bed} beds',
+                                              style: TextStyle(
+                                                color: HenryColors.puti,
+                                                fontSize: 15.sp,
                                               ),
                                             ),
                                           ),

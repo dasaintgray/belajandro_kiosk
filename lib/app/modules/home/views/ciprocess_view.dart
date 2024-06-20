@@ -63,12 +63,7 @@ class CiprocessView extends GetView {
                                   shadowColor: HenryColors.teal.withOpacity(0.5),
                                   onTap: () async {
                                     switch (index) {
-                                      case 0: //booked room
-                                        Get.defaultDialog(
-                                          title: 'Info',
-                                          middleText: 'To be follow',
-                                        );
-                                        break;
+                                      // case 0: //booked room
                                       case 1: //walkin
                                         hc.isLoading.value = true;
                                         final response = await hc.fetchRoomTypes(
@@ -82,6 +77,9 @@ class CiprocessView extends GetView {
                                           hc.pageTitle.value = 'SELECT ROOM TYPE';
                                         }
                                         if (response!) {
+                                          hc.isLoading.value = true;
+                                          await hc.fetchReactiveRoomType(
+                                              langCode: hc.languageCode.value, agentID: hc.iAgentTypeID.value);
                                           Get.to(
                                             () => RoomTypeView(
                                               titulo: hc.pageTitle.value,
@@ -90,6 +88,11 @@ class CiprocessView extends GetView {
                                         }
                                         break;
                                       default:
+                                        Get.defaultDialog(
+                                          title: 'Info',
+                                          middleText: 'To be follow',
+                                        );
+                                        break;
                                     }
                                   },
                                 );

@@ -104,7 +104,14 @@ class NoofdaysView extends GetView {
                       ),
                       SizedBox(
                         height: 5.h,
-                        width: double.infinity,
+                        width: 90.w,
+                        child: Text(
+                          'Please, double tap the date to clear the selection',
+                          style: TextStyle(
+                            color: HenryColors.puti,
+                            fontSize: 11.sp,
+                          ),
+                        ),
                       ),
                       SizedBox(
                         height: 6.h,
@@ -120,6 +127,9 @@ class NoofdaysView extends GetView {
                                 final response = await hc.fetchPayment(langCode: hc.languageCode.value);
                                 if (response!) {
                                   hc.isLoading.value = false;
+                                  final response = hc.getRandromRoomNumber();
+                                  hc.selectedRooNumber.value = response.$1!;
+                                  hc.selectedLockCode.value = response.$2!;
                                   // await hc.initCamera();
                                   // await hc.getCamera();
                                   Get.to(
@@ -139,7 +149,7 @@ class NoofdaysView extends GetView {
                                   : Text(
                                       hc.noofdays.value == 0
                                           ? 'OK'
-                                          : 'Agree (${hc.noofdays.value} ${hc.noofdays.value >= 2 ? 'days' : 'day'})?',
+                                          : 'Agree (${hc.noofdays.value} ${hc.noofdays.value >= 2 ? 'nights' : 'night'})?',
                                       style: TextStyle(
                                         color: HenryColors.puti,
                                         fontSize: 15.sp,

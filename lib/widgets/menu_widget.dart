@@ -36,11 +36,11 @@ class MenuWidget extends StatelessWidget {
             BoxShadow(
               // color: HenryColors.teal.withOpacity(.5),
               color: shadowColor,
-              blurRadius: 15.0, // soften the shadow
+              blurRadius: 8.0, // soften the shadow
               spreadRadius: 0.0, //extend the shadow
               offset: const Offset(
-                7.0, // Move to right 10  horizontally
-                7.0, // Move to bottom 10 Vertically
+                5.0, // Move to right 10  horizontally
+                5.0, // Move to bottom 10 Vertically
               ),
             )
           ],
