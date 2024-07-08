@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:belajandro_kiosk/app/data/graphql_model/availablerooms_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/people_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/room_type_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/seriesdetails_model.dart';
+import 'package:belajandro_kiosk/services/base/base_client_service.dart';
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/providers/service_providers.dart';
@@ -43,7 +45,7 @@ class ServiceModel {
     }
   }
 
-  static Future<List<RoomTypeModel>?> getRoomTypes({required String? documents, Map<String, dynamic>? docVar}) async {
+  static Future<List<RoomTypeModel>?> getRoomTypes({required String? documents, Map<String, int>? docVar}) async {
     final response = await ServiceProvider.gQLQuery(
         graphQLURL: GlobalConstant.gqlURL, documents: documents, headers: GlobalConstant.globalHeader, docVar: docVar);
     if (response['data']['vRoomTypes'] != null) {
@@ -92,6 +94,21 @@ class ServiceModel {
     }
   }
 
+  static Future<List<PeoplesModel>?> getPeople({required Map<String, String> params}) async {
+    final response = await ServiceProvider.gQLQuery(
+      graphQLURL: GlobalConstant.gqlURL,
+      headers: GlobalConstant.globalHeader,
+      documents: GQLData.qrPeople,
+      docVar: params,
+    );
+
+    if (response['data']['People_aggregate']['aggregate']['count'] != 0) {
+      return peoplesModelFromJson(jsonEncode(response['data']['People']));
+    } else {
+      return null;
+    }
+  }
+
   // SUBSCRIPTION
   static Future<Snapshot<dynamic>> getAvailableRoomsSubscription({required Map<String, int>? docParams}) async {
     final response = await ServiceProvider.getSubscription(
@@ -113,5 +130,34 @@ class ServiceModel {
     return response;
   }
 
+  static Future<Snapshot> getTerminalDataSubscription({required Map<String, dynamic>? docParams}) async {
+    final response = await ServiceProvider.getSubscription(
+      graphQLURL: GlobalConstant.gqlURL,
+      documents: GQLData.sTerminalData,
+      headers: GlobalConstant.globalHeader,
+      docVar: docParams,
+    );
+    return response;
+  }
+
   // for LANGUAGE
+
+  // DITO YUNG REST API CALLER
+  static Future<dynamic> submitKioskServiceCommand(
+      {required String? hostURL, required String sCommand, required int? terminalID, required String? apiKEY}) async {
+    final sCommandToProcess = 'processcommand?command=$sCommand&Terminal=$terminalID';
+
+    final Map<String, String> httpHeader = {
+      'content-type': 'application/json',
+      'connection': 'keep-alive',
+      'API_KEY': apiKEY!,
+    };
+
+    final response = await HenryBaseClient().getv1(hostURL!, sCommandToProcess, httpHeader);
+    if (response != null) {
+      return response;
+    } else {
+      return null;
+    }
+  }
 } //end of service_model

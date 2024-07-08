@@ -10,6 +10,9 @@ class KioskTextFormField extends StatelessWidget {
   final int? maxLength;
   final Widget? unahangICON;
   final Function() onTap;
+  final Function(String)? onChanged;
+  final bool? isNumeric;
+  final FocusNode? focusNode;
   // final Function(PointerDownEvent) onTapOutside;
 
   const KioskTextFormField({
@@ -20,6 +23,9 @@ class KioskTextFormField extends StatelessWidget {
     required this.onTap,
     this.unahangICON,
     this.maxLength,
+    this.onChanged,
+    this.focusNode,
+    required this.isNumeric,
   });
 
   @override
@@ -32,11 +38,23 @@ class KioskTextFormField extends StatelessWidget {
       maxLength: maxLength,
       // onTapOutside: onTapOutside,
       onTap: onTap,
+      onChanged: onChanged,
+      focusNode: focusNode,
       validator: (value) {
-        return Validator.validateTextOnly(value!);
+        if (isNumeric!) {
+          return Validator.validatePhoneNumber(value!);
+        } else {
+          if (value!.contains(RegExp(r"@"))) {
+            return Validator.validateEmail(value);
+          } else {
+            return Validator.validateTextOnly(value);
+          }
+        }
       },
       inputFormatters: [
-        FilteringTextInputFormatter(RegExp(r'[a-zA-Z]'), allow: true),
+        isNumeric!
+            ? FilteringTextInputFormatter(RegExp(r'[0-9]'), allow: true)
+            : FilteringTextInputFormatter(RegExp(r'[a-zA-Z]'), allow: true),
       ],
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(

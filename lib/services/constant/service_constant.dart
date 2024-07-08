@@ -17,5 +17,29 @@ class GlobalConstant {
   static const weatherParams = 'q=Angeles City';
 
   static const int receiveTimeOut = 20;
-  static const int connectionTimeOut = 20;
+  static const int connectionTimeOut = 25;
+
+  // HARDWARE
+  // CASH ACCEPTOR
+  static const String startCashAcceptor = 'CASA';
+  static const String stopCashAcceptor = 'CASH';
+  static const String getCashCount = 'CASC';
+  static const String postPayOut = 'CASD';
+  static const String resetCashAcceptor = 'CASR';
+  static const String emptyCashAcceptor = 'CASE';
+  static const String cashInsert = 'CASI';
+}
+
+enum Pera {
+  bente(20.00, "p20"),
+  tapwe(50.00, "p50"),
+  isangdaan(100.00, "p100"),
+  dalawangdaan(200.00, "p200"),
+  limangdaan(500.00, "p500"),
+  isanglibo(1000.00, "p1000");
+
+  final double halaga;
+  final String value;
+
+  const Pera(this.halaga, this.value);
 }

@@ -5,8 +5,8 @@ class ServiceProvider extends BaseController {
   // QUERY
   static Future<dynamic> gQLQuery(
       {required String? graphQLURL,
-      required String? documents,
       required Map<String, String>? headers,
+      required String? documents,
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 
@@ -23,8 +23,8 @@ class ServiceProvider extends BaseController {
   // SUBSCRIPTION
   static Future<Snapshot<dynamic>> getSubscription(
       {required String? graphQLURL,
-      required String? documents,
       required Map<String, String>? headers,
+      required String? documents,
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 
@@ -37,8 +37,8 @@ class ServiceProvider extends BaseController {
   // MUTATION
   static Future<dynamic> updateGraphQL(
       {required String? graphQLURL,
-      required String? documents,
       required Map<String, String>? headers,
+      required String? documents,
       Map<String, dynamic>? docVar}) async {
     HasuraConnect hasuraConnect = HasuraConnect(graphQLURL!, headers: headers!);
 

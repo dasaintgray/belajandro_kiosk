@@ -45,6 +45,8 @@ class ScreenController extends GetxController with BaseController {
   final tempC = 0.obs;
   final iAgentTypeID = 2.obs;
 
+  late var apiKEY = '';
+
   // LIST
   final List cities = [
     'Angeles City',
@@ -105,6 +107,9 @@ class ScreenController extends GetxController with BaseController {
 
       final agentData = settingsList.first.data.settings.where((element) => element.code == 'AGENTID');
       iAgentTypeID.value = int.parse(agentData.first.value);
+
+      final keyAPI = settingsList.first.data.settings.where((element) => element.code == 'APIKEY');
+      apiKEY = keyAPI.first.value;
 
       final response = await getWeather(sCITY.value);
       if (response) {

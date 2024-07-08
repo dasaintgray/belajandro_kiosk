@@ -18,3 +18,15 @@ final TextStyle titleTextStyle = TextStyle(
   fontFamily: bernardMT,
   color: HenryColors.teal,
 );
+
+final TextStyle contentTextStyle = TextStyle(
+  fontSize: 20.sp,
+  fontFamily: productSans,
+  color: HenryColors.puti,
+);
+
+final TextStyle contentTextStyle15 = TextStyle(
+  fontSize: 18.sp,
+  fontFamily: productSans,
+  color: HenryColors.puti,
+);

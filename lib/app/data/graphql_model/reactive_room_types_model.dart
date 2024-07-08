@@ -14,7 +14,7 @@ class ReactiveRoomTypesModel {
   final int id;
   final String code;
   final int locationId;
-  final String description;
+  String description;
   final List<Price> price;
   final Available available;
 
@@ -74,7 +74,7 @@ class Total {
       );
 
   Map<String, dynamic> toJson() => {
-        "count": count,
+        "count": count.toInt(),
       };
 }
 
@@ -90,6 +90,6 @@ class Price {
       );
 
   Map<String, dynamic> toJson() => {
-        "rate": rate,
+        "rate": rate.toDouble(),
       };
 }

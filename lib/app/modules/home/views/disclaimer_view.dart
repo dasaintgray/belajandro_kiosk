@@ -54,7 +54,7 @@ class DisclaimerView extends GetView {
                       sc.getDisclaimer(hc.languageID.value),
                       style: TextStyle(
                         color: HenryColors.puti,
-                        fontSize: 15.sp,
+                        fontSize: 10.sp,
                       ),
                     ),
                   ),
@@ -71,6 +71,7 @@ class DisclaimerView extends GetView {
                       width: 30.w,
                       child: ElevatedButton(
                         onPressed: () {
+                          hc.clearToDefault();
                           Get.snackbar(
                             "Thank you",
                             "Thank you very much for using Belajandro Kiosk System",
@@ -99,6 +100,7 @@ class DisclaimerView extends GetView {
                           final translatedText =
                               await hc.iTranslate(languageCode: hc.languageCode.value, sourceText: 'GUEST INFORMATION');
                           await hc.initializeCamera();
+                          hc.isLoading.value = false;
                           Get.to(
                             () => GuestInfoView(titulo: translatedText!),
                           );

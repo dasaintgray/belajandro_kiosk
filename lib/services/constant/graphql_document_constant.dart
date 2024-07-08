@@ -147,6 +147,41 @@ class GQLData {
       }
     }''';
 
+  static String qPeople = r'''
+  query getPeople($name: String, $mobileNo: String!) {
+    People(where: {Name: {_like: $name}, _or: {mobileNo: {_eq: $mobileNo}}, email: {_is_null: false}}) {
+      Id
+      fName
+      mName
+      lName
+      mobileNo
+      email
+      code
+      Name
+    }
+  }
+  ''';
+
+  static String qrPeople = r'''
+  query People($email: String!) {
+    People(where: {email: {_is_null: false}, _and: {email: {_eq: $email}}}) {
+      Id
+      fName
+      mName
+      lName
+      mobileNo
+      email
+      code
+      Name
+    }
+    People_aggregate(where: {email: {_eq: $email}}) {
+      aggregate {
+        count
+      }
+    }
+  }
+  ''';
+
   /// MUTATION
   /// --------------------------------------------------------------------------
   ///
@@ -178,6 +213,22 @@ class GQLData {
     update_SeriesDetails(_set: {isActive: $isActive, modifiedBy: $modifiedBy, modifiedDate: $modifiedDate, 
       reservationDate: $reservationDate, tranDate: $tranDate}, 
       where: {Id: {_eq: $seriesID}}) {
+      affected_rows
+    }
+  }
+  ''';
+
+  static String mUpdateTerminalData = r'''
+  mutation updateTerminalData($tID: Int!, $terminalID: Int!, $status: String!, $code: String!) {
+    update_TerminalDatas(where: {Id: {_eq: $tID}, TerminalId: {_eq: $terminalID}, status: {_eq: $status}, code: {_eq: $code}}, _set: {status: "READ"}) {
+      affected_rows
+    }
+  }
+  ''';
+
+  static String mUpdateTD = r'''
+  mutation updateTD($tID: Int!, $terminalID: Int!) {
+    update_TerminalDatas(where: {Id: {_eq: $tID}, TerminalId: {_eq: $terminalID}}, _set: {status: "READ"}) {
       affected_rows
     }
   }
@@ -215,6 +266,19 @@ class GQLData {
           count(distinct: true)
         }
       }
+    }
+  }
+  ''';
+
+  static String sTerminalData = r'''
+  subscription getTerminalData($terminalID: Int!, $status: String!) {
+    TerminalDatas(where: {TerminalId: {_eq: $terminalID}, status: {_eq: $status}}) {
+      Id
+      TerminalId
+      code
+      meta
+      status
+      value
     }
   }
   ''';

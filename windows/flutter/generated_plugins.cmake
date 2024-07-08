@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   camera_windows
+  flutter_libserialport
   screen_retriever
   window_manager
 )

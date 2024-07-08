@@ -9,28 +9,33 @@ import 'dart:ffi' as ffi;
 import 'package:belajandro_kiosk/app/data/graphql_model/availablerooms_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/menu_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/paymenttype_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/people_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/prefix_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/reactive_room_types_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/room_type_model.dart';
 import 'package:belajandro_kiosk/app/data/graphql_model/seriesdetails_model.dart';
+import 'package:belajandro_kiosk/app/data/graphql_model/terminal_data_model.dart';
 import 'package:belajandro_kiosk/services/constant/graphql_document_constant.dart';
 import 'package:belajandro_kiosk/services/constant/lottie_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/providers/service_providers.dart';
 import 'package:belajandro_kiosk/services/service_model/service_model.dart';
 import 'package:csharp_rpc/csharp_rpc.dart';
+import 'package:email_otp/email_otp.dart';
 import 'package:ffi/ffi.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_libserialport/flutter_libserialport.dart';
 import 'package:get/get.dart';
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:translator/translator.dart' as tagasalin;
 import 'package:windows_networking/windows_networking.dart';
+import 'package:dotenv/dotenv.dart';
 
 // ignore: depend_on_referenced_packages
 import 'package:camera_platform_interface/camera_platform_interface.dart';
@@ -44,6 +49,10 @@ class HomeController extends GetxController {
   final isButtonSubmitReady = false.obs;
   final isNumericKeypad = false.obs;
   final isEmailKeypad = false.obs;
+  final isRegistered = true.obs; //check if already registered
+  final isTextNotEmpty = false.obs;
+  final isOverPaymentDetected = false.obs;
+  final isConfirmReady = false.obs;
 
   // integer area
   final languageID = 1.obs;
@@ -53,6 +62,19 @@ class HomeController extends GetxController {
   final noofdays = 0.obs;
   final agentID = 2.obs;
   final iAgentTypeID = 2.obs;
+  // MONEY DUE
+  final iP20 = 0.obs;
+  final iP50 = 0.obs;
+  final iP100 = 0.obs;
+  final iP200 = 0.obs;
+  final iP500 = 0.obs;
+  final iP1000 = 0.obs;
+  final iTotal = 0.obs;
+
+  // double
+  final nabasangPera = 0.00.obs;
+  final totalAmountDue = 0.00.obs;
+  final overPayment = 0.00.obs;
 
   // STRING
   final selectedRooNumber = ''.obs;
@@ -68,6 +90,12 @@ class HomeController extends GetxController {
   final prefixList = <PrefixModel>[];
   final seriesDetailsList = <SeriesDetailsModel>[];
   final availableRoomList = <AvailableRoomsModel>[];
+  final peopleList = <PeoplesModel>[];
+  final terminalDataList = <TerminalDataModel>[];
+
+  // LATE VARIABLE DECLARATION
+  late var terminalNo = 0;
+  late var terminalName = '';
 
   final List animationList = [
     LottieConstant.circularProgress,
@@ -124,6 +152,7 @@ class HomeController extends GetxController {
   final TextEditingController middleName = TextEditingController();
   final TextEditingController phoneNumber = TextEditingController();
   final TextEditingController emailAddress = TextEditingController();
+  final TextEditingController otp = TextEditingController();
 
   final TextEditingController discriminator = TextEditingController(); //auto filled = Contact
   final globalTEC = TextEditingController().obs;
@@ -149,6 +178,9 @@ class HomeController extends GetxController {
 
   // SNAPSHOT DATA
   late final Snapshot availRoomSnapshot;
+  late final Snapshot terminalDataSnapshot;
+
+  late DotEnv globalEnv;
 
   @override
   void onInit() async {
@@ -161,7 +193,13 @@ class HomeController extends GetxController {
   @override
   void onReady() async {
     super.onReady();
+    globalEnv = DotEnv(includePlatformEnvironment: true)..load();
+    terminalName = globalEnv['TERMINAL_NAME']!;
+    terminalNo = int.parse(globalEnv['TERMINAL_NO']!);
 
+    // initEmailSender();
+
+    // email verification otp
     // checkBonwin(30);
 
     // final test = NetworkInformation.getConnectionProfiles();
@@ -206,6 +244,61 @@ class HomeController extends GetxController {
     middleName.dispose();
   }
 
+  void initEmailSender() {
+    EmailOTP.config(
+      appName: globalEnv['APP_NAME'] ?? 'Belajandro Hotel Kiosk System',
+      appEmail: globalEnv['APP_EMAIL'] ?? 'kiosk@belajandrohotel.com',
+      otpType: OTPType.numeric,
+      // emailTheme: EmailTheme.v4,
+    );
+
+    EmailOTP.setSMTP(
+      emailPort: EmailPort.port587,
+      secureType: SecureType.tls,
+      host: globalEnv['EMAIL_HOST'] ?? 'smtp.mailersend.net',
+      username: globalEnv['EMAIL_USERNAME'] ?? 'MS_RmErOq@trial-7dnvo4dk9z3l5r86.mlsender.net',
+      password: globalEnv['EMAIL_PASSWORD'] ?? 'xs319c5CerQ7fLyA',
+    );
+
+    // EmailOTP.setTemplate(
+    //   template: globalEnv['EMAIL_TEMPLATE'] ??
+    //       '''
+    //   <div style="background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;">
+    //     <div style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    //       <h1 style="color: #333;">{{appName}}</h1>
+    //       <h2 style="color: #333;">Your OTP</h2>
+    //       <h2 style="background: #00466a; color: #fff;border-radius: 4px;width: max-content;padding: 0 20px">{{otp}}</h2>
+    //       <p style="color: #333;">This OTP is valid for 5 minutes.</p>
+    //       <p style="color: #333;">Thank you for using {{appName}}.</p>
+    //     </div>
+    //   </div>
+    //   ''',
+    // );
+
+    EmailOTP.setTemplate(
+      template: '''
+      <div style="background-color: #f4f4f4; padding: 20px; font-family: Arial, sans-serif;">
+        <div style="background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+          <h1 style="color: #333;">{{appName}}</h1>
+          <h2 style="color: #333;">Your OTP</h2>
+          <h2 style="background: #00466a; color: #fff;border-radius: 4px;width: max-content;padding: 0 20px">{{otp}}</h2>
+          <p style="color: #333;">This OTP is valid for 5 minutes.</p>
+          <p style="color: #333;">Thank you for using {{appName}}.</p>
+        </div>
+      </div>
+      ''',
+    );
+  }
+
+  Future<bool> setupEmail({required String? emailAddressToSend}) async {
+    initEmailSender();
+    final response = await EmailOTP.sendOTP(email: emailAddressToSend!);
+    if (response) {
+      return true;
+    }
+    return false;
+  }
+
   /// TRANSACTION
   /// --------------------------------------------------------------------------
   Future<bool?> addContacts({
@@ -226,7 +319,7 @@ class HomeController extends GetxController {
         "mi": mName,
         "ln": lastName,
         "prefixID": prefixID,
-        "cby": "Kiosk Terminal 1",
+        "cby": terminalName,
         "cdate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
         "mobileNo": mobileNo,
         "email": emailAddress,
@@ -250,7 +343,7 @@ class HomeController extends GetxController {
         final Map<String, dynamic> contactParams = {
           "contactID": peopleID,
           "photo": larawan,
-          "createdBy": "Kiosk Terminal 1",
+          "createdBy": terminalName,
           "createdDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
         };
         final contactResponse = await ServiceProvider.updateGraphQL(
@@ -263,7 +356,7 @@ class HomeController extends GetxController {
           // UPDATE THE SERIES DETAILS
           final Map<String, dynamic> updateParams = {
             "isActive": false,
-            "modifiedBy": "Kiosk Terminal 1",
+            "modifiedBy": terminalName,
             "modifiedDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
             "reservationDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
             "tranDate": DateFormat('yyyy-MM-dd HH:mm:ss').format(orasNgayon),
@@ -284,6 +377,15 @@ class HomeController extends GetxController {
     return false;
   }
 
+  Future startCashAcceptor() async {
+    final startPath = globalEnv['LEYM_SERVICE'];
+    final comPort = globalEnv['CASH_ACCEPTOR_PORT'];
+    final rpcService = await CsharpRpc(startPath!).start();
+
+    final response = rpcService.invoke(method: "RunCashValidator", params: [comPort, 0]);
+    if (kDebugMode) print(response);
+  }
+
   Future<Map<String, dynamic>?> processBonwinCard(
       {required String servicePath, required String command, List<dynamic>? params}) async {
     late final Map<String, dynamic> response;
@@ -300,6 +402,9 @@ class HomeController extends GetxController {
         break;
       case "revoke":
         response = await rpcservice.invoke<Map<String, dynamic>>(method: "DisableCard").timeout(15.seconds);
+        break;
+      case "RunCashValidator":
+        break;
     }
     if (response["success"]) {
       rpcservice.dispose(); //shutdown the service
@@ -410,7 +515,7 @@ class HomeController extends GetxController {
   }
 
   Future<bool?> fetchRoomTypes({required String? langCode, required int? agentID}) async {
-    final Map<String, dynamic> param = {"agentID": agentID ??= 2};
+    final Map<String, int> param = {"agentID": agentID ??= 2};
 
     final response = await ServiceModel.getRoomTypes(documents: GQLData.qRoomType, docVar: param);
     if (response != null) {
@@ -475,17 +580,197 @@ class HomeController extends GetxController {
       "AgentTypdID": agentID!,
       "roomTypeID": roomTypeID!,
     };
-    final availRoomSnapshot = await ServiceModel.getAvailableRoomsSubscription(docParams: params);
+    availRoomSnapshot = await ServiceModel.getAvailableRoomsSubscription(docParams: params);
 
     // LISTEN ON SNAPSHOT
-    availRoomSnapshot.listen((event) {
-      final eventResponse = availableRoomsModelFromJson(jsonEncode(event['data']['vRoomAvailable']));
+    availRoomSnapshot.listen(
+      (event) {
+        final eventResponse = availableRoomsModelFromJson(jsonEncode(event['data']['vRoomAvailable']));
+        if (eventResponse.isNotEmpty) {
+          availableRoomList.clear();
+          availableRoomList.addAll(eventResponse);
+          isLoading.value = false;
+        }
+      },
+    );
+  }
+
+  Future<dynamic> fetchTerminalData({required int terminalID}) async {
+    final Map<String, dynamic> params = {
+      "terminalID": terminalID,
+      "status": "NEW",
+    };
+    terminalDataSnapshot = await ServiceModel.getTerminalDataSubscription(docParams: params);
+
+    //listen on the snapshopt
+    terminalDataSnapshot.listen((event) {
+      final eventResponse = terminalDataModelFromJson(jsonEncode(event['data']['TerminalDatas']));
       if (eventResponse.isNotEmpty) {
-        availableRoomList.clear();
-        availableRoomList.addAll(eventResponse);
-        isLoading.value = false;
+        terminalDataList.clear();
+        terminalDataList.addAll(eventResponse);
+
+        if (kDebugMode) print(terminalDataList.first.code);
+        if (terminalDataList.first.code == GlobalConstant.cashInsert) {
+          final valueRead = terminalDataList.first.value;
+          if (valueRead.isCurrency) {
+            nabasangPera.value == 0.00
+                ? nabasangPera.value = double.parse(valueRead)
+                : nabasangPera.value = nabasangPera.value + double.parse(valueRead);
+            if (kDebugMode) print('COMPUTED DENOM: ${nabasangPera.value}');
+            // ADD DENOMINATION COUNT IN DB
+            updateDenominationData(klaseNgPera: valueRead, iCount: 1, terminalID: terminalID, bCounterIncrement: true);
+
+            // UPDATE THE TERMINAL DATA
+            updateTD(recordID: terminalDataList.first.id, terminalID: terminalID);
+
+            // chech the money
+            if (nabasangPera.value >= totalAmountDue.value) {
+              if (nabasangPera.value == totalAmountDue.value) {
+                isOverPaymentDetected.value = false;
+              } else {
+                overPayment.value = nabasangPera.value - totalAmountDue.value;
+                isOverPaymentDetected.value = true;
+              }
+              isConfirmReady.value = true;
+              // openLEDLibserial(ledLocationAndStatus: LedOperation.cashDispenserOFF, portName: ledPort.value);
+              // cashDispenserCommand(sCommand: APIConstant.cashPoolingStop, iTerminalID: defaultTerminalID.value);
+            } else {
+              isConfirmReady.value = false;
+            }
+          }
+        }
+        updateTD(recordID: terminalDataList.first.id, terminalID: terminalDataList.first.terminalId);
       }
     });
+  }
+
+  // UPDATE THE TERMINAL DATA USING MUTATION
+  // DATE: 14 AUGUST, 2023
+  Future<bool?> updateTD({required int recordID, required int terminalID}) async {
+    Map<String, dynamic> params = {"tID": recordID, "terminalID": terminalID};
+
+    // var response = await GlobalProvider()
+    //     .mutateGraphQLData(documents: updateTerminalDataGraphQL, variables: params, accessHeaders: accessToken);
+    final response = await ServiceProvider.updateGraphQL(
+        graphQLURL: GlobalConstant.gqlURL,
+        headers: GlobalConstant.globalHeader,
+        documents: GQLData.mUpdateTD,
+        docVar: params);
+    if (response['data']['update_TerminalDatas']['affected_rows'] != null) {
+      // print(response);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> updateDenominationData(
+      {required String klaseNgPera,
+      required int iCount,
+      required int terminalID,
+      required bool bCounterIncrement}) async {
+    // ignore: constant_pattern_never_matches_value_type
+    final String docs;
+
+    if (kDebugMode) print(klaseNgPera);
+
+    switch (klaseNgPera) {
+      case "20.00" || "20.0" || "20":
+        {
+          iP20.value = bCounterIncrement ? iP20.value + iCount : iP20.value - iCount;
+          docs =
+              'mutation updateTerminalDenomination {update_TerminalDenominations(where: {TerminalId: {_eq: $terminalID}}, _set: {p20: ${iP20.value}}) {affected_rows}}';
+        }
+        break;
+      case "50.00" || "50.0" || "50":
+        {
+          iP50.value = bCounterIncrement ? iP50.value + iCount : iP50.value - iCount;
+          docs =
+              'mutation updateTerminalDenomination {update_TerminalDenominations(where: {TerminalId: {_eq: $terminalID}}, _set: {p50: ${iP50.value}}) {affected_rows}}';
+        }
+        break;
+      case "100.00" || "100.0" || "100":
+        {
+          iP100.value = bCounterIncrement ? iP100.value + iCount : iP100.value - iCount;
+          docs =
+              'mutation updateTerminalDenomination {update_TerminalDenominations(where: {TerminalId: {_eq: $terminalID}}, _set: {p100: ${iP100.value}}) {affected_rows}}';
+        }
+        break;
+      case "200.00" || "200.0" || "200":
+        {
+          iP200.value = bCounterIncrement ? iP200.value + iCount : iP200.value - iCount;
+          docs =
+              'mutation updateTerminalDenomination {update_TerminalDenominations(where: {TerminalId: {_eq: $terminalID}}, _set: {p200: ${iP200.value}}) {affected_rows}}';
+        }
+        break;
+      case "500.00" || "500.0" || "500":
+        {
+          iP500.value = bCounterIncrement ? iP500.value + iCount : iP500.value - iCount;
+          docs =
+              'mutation updateTerminalDenomination {update_TerminalDenominations(where: {TerminalId: {_eq: $terminalID}}, _set: {p500: ${iP500.value}}) {affected_rows}}';
+        }
+        break;
+      case "1000.00" || "1000.0" || "1000":
+        {
+          iP1000.value = bCounterIncrement ? iP1000.value + iCount : iP1000.value - iCount;
+          docs =
+              'mutation updateTerminalDenomination {update_TerminalDenominations(where: {TerminalId: {_eq: $terminalID}}, _set: {p1000: ${iP1000.value}}) {affected_rows}}';
+        }
+        break;
+      default:
+        {
+          docs =
+              'mutation updateDenomination {TerminalDenominations(mutate: {TerminalId : $terminalID } where: {TerminalId: $terminalID}) {Ids response}}';
+        }
+        break;
+    }
+
+    // if (kDebugMode) print(docs);
+    final response = ServiceProvider.updateGraphQL(
+        graphQLURL: GlobalConstant.gqlURL, headers: GlobalConstant.globalHeader, documents: docs);
+    // ignore: unnecessary_null_comparison
+    if (response != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool?> fetchPeople({required String? emailAddress}) async {
+    final Map<String, String> params = {"email": emailAddress!};
+
+    final response = await ServiceModel.getPeople(params: params);
+    if (response != null) {
+      peopleList.addAll(response);
+      return true;
+    }
+    return false;
+  }
+
+  /// UPDATE AREA
+  /// UPDATE TERMINAL DATAS
+  Future<bool> updateTerminalData({
+    required int? tableID,
+    required int? terminalID,
+    required String? code,
+  }) async {
+    final Map<String, dynamic> updateParams = {
+      "tID": tableID,
+      "terminalID": terminalID,
+      "status": "NEW",
+      "code": code,
+    };
+
+    final response = await ServiceProvider.updateGraphQL(
+      graphQLURL: GlobalConstant.gqlURL,
+      headers: GlobalConstant.globalHeader,
+      documents: GQLData.mUpdateTerminalData,
+      docVar: updateParams,
+    );
+    if (response['data']['update_TerminalDatas']['affected_rows'] != 0) {
+      return true;
+    }
+    return false;
   }
 
   bool makeMenu({required int? languageID, required String? code, String? type}) {
@@ -741,6 +1026,54 @@ class HomeController extends GetxController {
     return false;
   }
 
+  /// SERIAL COMMUNICATION ************************************************************
+  /// THIS IS AREA IS BELONG TO THE SERIAL COMMUNICATION
+  /// HARDWARE LIKE, PRINTER, LED LIGHTS, QRCODE SCANNER, ETC
+  /// AUTHOR: HENRY V. MEMPIN
+  /// DATE: 5 JULY 2024
+  /// *********************************************************************************
+  /// LED LIGHTS
+  void signalLEDLights({required String? sCommandMode, String? comPort}) {
+    final serialConfig = SerialPortConfig();
+    final port = SerialPort(comPort ?? globalEnv['LED_LIGHTS_PORT']!);
+    serialConfig.baudRate = 9600;
+    serialConfig.parity = SerialPortParity.none;
+
+    if (port.isOpen) {
+      port.close();
+    } else {
+      if (kDebugMode) print('Connect to ${port.name}');
+    }
+
+    port.openWrite();
+
+    //encode the string using specific encoding (e.g, ASCII)
+    List<int> encodedBytes = ascii.encode(sCommandMode!);
+
+    //create a Uint8List from the encoded bytes
+    Uint8List uint8list = Uint8List.fromList(encodedBytes);
+
+    port.isOpen ? port.write(uint8list) : port.close();
+  }
+
+  /// FOR KIOSK SERVICE
+  /// AUTHOR: Henry V. Mempin
+  /// Date: 5 July 2024 @ CM HQ
+  /// Future / Async
+  Future<bool> sendKioskCommand({required String? sCommand, required String apiKEY}) async {
+    final response = await ServiceModel.submitKioskServiceCommand(
+      hostURL: globalEnv['KIOSK_SERVICE']!,
+      sCommand: sCommand!,
+      terminalID: terminalNo,
+      apiKEY: apiKEY,
+    ).timeout(GlobalConstant.connectionTimeOut.seconds);
+    if (response != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<void> getCamera() async {
     try {
       cameraList.value = await CameraPlatform.instance.availableCameras();
@@ -849,5 +1182,17 @@ class HomeController extends GetxController {
   Future<String?> iTranslate({required String languageCode, required String sourceText}) async {
     final response = await isalin.translate(sourceText, to: languageCode);
     return response.toString();
+  }
+
+  void clearToDefault() {
+    languageID.value = 1;
+    selectedRoomType.value = 0;
+    selectedPaymentType.value = 0; //cash
+    selectedPrefixID.value = 1;
+    noofdays.value = 0;
+    agentID.value = 2;
+    iAgentTypeID.value = 2;
+    selectedRooNumber.value = '';
+    selectedLockCode.value = '';
   }
 }
