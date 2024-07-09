@@ -1,7 +1,9 @@
 import 'package:belajandro_kiosk/app/modules/home/controllers/home_controller.dart';
+import 'package:belajandro_kiosk/app/modules/home/views/printing_view.dart';
 import 'package:belajandro_kiosk/app/modules/screen/controllers/screen_controller.dart';
 import 'package:belajandro_kiosk/services/colors/service_colors.dart';
 import 'package:belajandro_kiosk/services/constant/image_constant.dart';
+import 'package:belajandro_kiosk/services/constant/ledlights_constant.dart';
 import 'package:belajandro_kiosk/services/constant/service_constant.dart';
 import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
@@ -124,26 +126,72 @@ class InsertPaymentView extends GetView {
                 SizedBox(
                   height: 5.h,
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final response =
-                          await hc.sendKioskCommand(sCommand: GlobalConstant.stopCashAcceptor, apiKEY: sc.apiKEY);
-                      if (response) {
+                  child: Obx(() => Visibility(
+                        visible: hc.nabasangPera.value != 0.00,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final response =
+                                await hc.sendKioskCommand(sCommand: GlobalConstant.stopCashAcceptor, apiKEY: sc.apiKEY);
+                            if (response) {
+                              //finalizination of guest check in
+                              //printing the receipt and
+                              //and release the card
+                              final vat = '1.${sc.iVat}';
+                              final computeVat = hc.totalAmountDue.value / double.parse(vat);
+                              final tax = hc.totalAmountDue.value - computeVat;
 
-                        //finalizination of guest check in 
-                        //printing the receipt and 
-                        //and release the card 
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: HenryColors.teal),
-                    child: Text(
-                      'CHECK-IN',
-                      style: TextStyle(
-                        color: HenryColors.puti,
-                        fontSize: 15.sp,
-                      ),
-                    ),
-                  ),
+                              hc.signalLEDLights(sCommandMode: LedlightsConstant.cashDispenserOFF, comPort: 'COM1');
+                              hc.signalLEDLights(sCommandMode: LedlightsConstant.printingON, comPort: 'COM1');
+                              final response = hc.printResibo(
+                                  address: sc.sCompanyAddress.value,
+                                  owner: sc.sCOMPANY.value,
+                                  telephone: sc.settingsList.first.data.settings
+                                      .where((element) => element.code == 'R2')
+                                      .first
+                                      .value,
+                                  email: sc.settingsList.first.data.settings
+                                      .where((element) => element.code == 'R5')
+                                      .first
+                                      .value,
+                                  vatTin: 'vat',
+                                  bookingID: 123,
+                                  terminalID: hc.terminalNo,
+                                  qty: 1,
+                                  roomRate: hc.salapi.format(hc.totalAmountDue.value),
+                                  deposit: '0.00',
+                                  totalAmount: hc.salapi.format(hc.totalAmountDue.value),
+                                  totalAmountPaid: hc.salapi.format(hc.nabasangPera.value),
+                                  paymentMethod: hc.paymentTypeList
+                                      .where((element) => element.id == hc.selectedPaymentType.value)
+                                      .first
+                                      .description,
+                                  changeValue: hc.salapi.format(hc.overPayment.value),
+                                  currencyString: 'PHP',
+                                  vatTable: computeVat.toStringAsFixed(2),
+                                  vatTax: tax.toStringAsFixed(2),
+                                  roomNumber: hc.selectedRooNumber.value,
+                                  timeConsume: hc.daysToStay.value,
+                                  endTime: '${hc.checkOutDate} @ ${sc.checkOutTime}',
+                                  isOR: true);
+                              if (response) {
+                                hc.signalLEDLights(sCommandMode: LedlightsConstant.printingOFF, comPort: 'COM1');
+
+                                Get.to(
+                                  () => PrintingView(),
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(backgroundColor: HenryColors.teal),
+                          child: Text(
+                            'CHECK-IN',
+                            style: TextStyle(
+                              color: HenryColors.puti,
+                              fontSize: 15.sp,
+                            ),
+                          ),
+                        ),
+                      )),
                 ),
                 SizedBox(
                   height: 3.h,

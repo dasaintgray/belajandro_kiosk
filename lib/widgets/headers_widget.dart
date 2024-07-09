@@ -226,7 +226,7 @@ class WeatherAndClock extends StatelessWidget {
                         minuteText: sc.sydney.value.substring(3, 5),
                       ),
                       ClockSkin(
-                        location: 'NEW YORK, USA',
+                        location: 'LOS ANGELES, USA',
                         hourText: sc.newYork.value.substring(0, 2),
                         minuteText: sc.newYork.value.substring(3, 5),
                         // height: 40.h,

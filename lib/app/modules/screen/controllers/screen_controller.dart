@@ -36,6 +36,8 @@ class ScreenController extends GetxController with BaseController {
   final sCOMPANY = ''.obs;
   final sCompanyAddress = ''.obs;
 
+  var checkOutTime = '';
+
   final tokyo = ''.obs;
   final sydney = ''.obs;
   final newYork = ''.obs;
@@ -44,6 +46,8 @@ class ScreenController extends GetxController with BaseController {
   // integer
   final tempC = 0.obs;
   final iAgentTypeID = 2.obs;
+
+  final iVat = 0.obs;
 
   late var apiKEY = '';
 
@@ -55,7 +59,7 @@ class ScreenController extends GetxController with BaseController {
     'Tagaytay City',
     'Tokyo',
     'Sydney',
-    'New York',
+    'Los Angeles',
     'Riyadh',
   ];
 
@@ -107,6 +111,12 @@ class ScreenController extends GetxController with BaseController {
 
       final agentData = settingsList.first.data.settings.where((element) => element.code == 'AGENTID');
       iAgentTypeID.value = int.parse(agentData.first.value);
+
+      final vat = settingsList.first.data.settings.where((element) => element.code == 'VAT');
+      iVat.value = int.parse(vat.first.value);
+
+      final out = settingsList.first.data.settings.where((element) => element.code == 'O1');
+      checkOutTime = out.first.value;
 
       final keyAPI = settingsList.first.data.settings.where((element) => element.code == 'APIKEY');
       apiKEY = keyAPI.first.value;
@@ -179,7 +189,7 @@ class ScreenController extends GetxController with BaseController {
         dtNow.value.minute, dtNow.value.second);
     DateTime sydneyTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour - 2,
         dtNow.value.minute, dtNow.value.second);
-    DateTime newYorkTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour + 12,
+    DateTime newYorkTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour + 15,
         dtNow.value.minute, dtNow.value.second);
     DateTime riyadhTime = DateTime(dtNow.value.year, dtNow.value.month, dtNow.value.day, dtNow.value.hour + 5,
         dtNow.value.minute, dtNow.value.second);

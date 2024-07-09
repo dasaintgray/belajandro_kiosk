@@ -136,12 +136,15 @@ class HomeController extends GetxController {
   final pageTitle = ''.obs;
   final languageCode = ''.obs;
   final range = ''.obs;
+  final daysToStay = ''.obs;
   final selectedDate = ''.obs;
   final dateCount = '0'.obs;
   final rangeCount = '0'.obs;
   final typeText = ''.obs; //hold the text that user typed on virtual keyboard
   final selectedPrefixData = 'MR'.obs;
   final keypadType = 'text'.obs;
+
+  var checkOutDate = '';
 
   // translator
   final isalin = tagasalin.GoogleTranslator();
@@ -171,6 +174,7 @@ class HomeController extends GetxController {
   // final CameraController cameraController = CameraController();
   // final ImagePickerPlatform imagePickerPlatform = ImagePickerPlatform.instance;
   final pera = NumberFormat.currency(locale: "en_PH", symbol: "₱", decimalDigits: 0);
+  final salapi = NumberFormat("#,###.00");
   final orasNgayon = DateTime.now();
 
   // SCROLL CONTROLLER
@@ -802,7 +806,7 @@ class HomeController extends GetxController {
   // BONWIN
 
   checkPrinterDLL() {
-    final dylib = ffi.DynamicLibrary.open("assets/library/printer/Msprintsdkx64.dll");
+    final dylib = ffi.DynamicLibrary.open("assets/service/printer/Msprintsdkx64.dll");
     if (!dylib.handle.address.isNaN) {
       // print('OK YUNG PRINTER');
     }
@@ -829,17 +833,19 @@ class HomeController extends GetxController {
     required String? vatTax,
     required String? roomNumber,
     required String? timeConsume,
-    required DateTime? endTime,
+    required String? endTime,
+    // required DateTime? endTime,
     required bool? isOR,
   }) {
     // final libPath = Platform.script.resolve("assets/hardware/Msprintsdkx64.dll").path;
     // final logoPath = Platform.script.resolve("assets/logo/iotel.bmp").path;
     // final dylib = ffi.DynamicLibrary.open(libPath.substring(1, libPath.length));
-    final dylib = ffi.DynamicLibrary.open("assets/library/printer/Msprintsdkx64.dll");
+    final dylib = ffi.DynamicLibrary.open("assets/service/printer/Msprintsdkx64.dll");
 
     DateTime dtNow = DateTime.now();
     final ngayongAraw = DateFormat('yyyy-MM-dd HH:mm:ss').format(dtNow);
-    final checkout = DateFormat("dd, MMM yyyy hh:mm aa").format(endTime!);
+    // final checkout = DateFormat("dd, MMM yyyy hh:mm aa").format(endTime!);
+    final checkout = endTime;
 
     if (!dylib.handle.address.isNaN) {
       final openPrinter = dylib.lookupFunction<ffi.Int32 Function(), int Function()>('SetUsbportauto');
@@ -865,10 +871,10 @@ class HomeController extends GetxController {
         final printCutpaper = dylib.lookupFunction<ffi.Int32 Function(ffi.Int32), int Function(int)>('PrintCutpaper');
         final setClose = dylib.lookupFunction<ffi.Int32 Function(), int Function()>("SetClose");
         final setBold = dylib.lookupFunction<ffi.Int32 Function(ffi.Int32), int Function(int)>("SetBold");
-        // final setSizechar = dylib.lookupFunction<ffi.Int32 Function(ffi.Int32, ffi.Int32, ffi.Int32, ffi.Int32),
-        //     int Function(int, int, int, int)>("SetSizechar");
-        // final printQrcode = dylib.lookupFunction<ffi.Int32 Function(ffi.Pointer<Utf8>, ffi.Int32, ffi.Int32, ffi.Int32),
-        //     int Function(ffi.Pointer<Utf8>, int, int, int)>("PrintQrcode");
+        final setSizechar = dylib.lookupFunction<ffi.Int32 Function(ffi.Int32, ffi.Int32, ffi.Int32, ffi.Int32),
+            int Function(int, int, int, int)>("SetSizechar");
+        final printQrcode = dylib.lookupFunction<ffi.Int32 Function(ffi.Pointer<Utf8>, ffi.Int32, ffi.Int32, ffi.Int32),
+            int Function(ffi.Pointer<Utf8>, int, int, int)>("PrintQrcode");
 
         // begin to use the function
         final initResponse = setInit();
@@ -877,14 +883,14 @@ class HomeController extends GetxController {
           setAlignment(1);
           // printFeedline(1);
           // printDiskbmpfile(logoPath.substring(1, logoPath.length).toNativeUtf8());
-          printDiskbmpfile('assets/logo/iotel.bmp'.toNativeUtf8());
+          printDiskbmpfile('assets/img/logo.bmp'.toNativeUtf8());
           //
           // printDiskbmpfile(emailPath.substring(1, emailPath.length).toNativeUtf8());
           setClean();
           printFeedline(1);
           setAlignment(1);
           setSizetext(1, 1);
-          // setSizechar(1, 1, 1, 1);
+          setSizechar(1, 1, 1, 1);
           printString(address.toString().toNativeUtf8(), 0);
           printString('Owned & Operated by:'.toNativeUtf8(), 0);
           setBold(1);
@@ -997,22 +1003,23 @@ class HomeController extends GetxController {
           printFeedline(1);
           setSizetext(1, 1);
           printString("YOU'RE STAYING WITH US FOR".toNativeUtf8(), 0);
-          setSizetext(2, 2);
+          // setSizetext(2, 2);
           printString("$timeConsume".toNativeUtf8(), 0);
           printFeedline(2);
           setSizetext(1, 1);
           printString("YOU'RE CHECK-OUT TIME IS:".toNativeUtf8(), 0);
           setSizetext(2, 2);
-          printString(checkout.toNativeUtf8(), 0);
+          // printString(checkout.toNativeUtf8(), 0);
+          printString(checkout!.toNativeUtf8(), 0);
           printFeedline(2);
           setSizetext(1, 1);
           printString('Please dial 0 if you need assistance'.toNativeUtf8(), 0);
           printString('Enjoy you stay'.toNativeUtf8(), 0);
           printFeedline(2);
-          printString('THIS OFFICIAL RECEIPT SHALL BE VALID'.toNativeUtf8(), 0);
-          printString('FOR FIVE(5) YEARS FROM THE DATE OF ATP'.toNativeUtf8(), 0);
-          printFeedline(1);
-          // printQrcode('WWW.CIRCUITMINDZ.COM'.toNativeUtf8(), 2, 8, 0);
+          // printString('THIS OFFICIAL RECEIPT SHALL BE VALID'.toNativeUtf8(), 0);
+          // printString('FOR FIVE(5) YEARS FROM THE DATE OF ATP'.toNativeUtf8(), 0);
+          // printFeedline(1);
+          printQrcode('WWW.CIRCUITMINDZ.COM'.toNativeUtf8(), 0, 5, 0);
           printString('www.circuitmindz.com'.toNativeUtf8(), 0);
 
           printFeedDot(100);
@@ -1049,7 +1056,6 @@ class HomeController extends GetxController {
 
     //encode the string using specific encoding (e.g, ASCII)
     List<int> encodedBytes = ascii.encode(sCommandMode!);
-
     //create a Uint8List from the encoded bytes
     Uint8List uint8list = Uint8List.fromList(encodedBytes);
 
@@ -1165,6 +1171,15 @@ class HomeController extends GetxController {
     if (args.value is PickerDateRange) {
       range.value = '${DateFormat('MMMM dd').format(args.value.startDate)} -'
           ' ${DateFormat('MMMM dd').format(args.value.endDate ?? args.value.startDate)}';
+      var simula = args.value.startDate;
+      var tapos = args.value.endDate ?? simula; //kung null and tapos gamiting ang simula
+
+      // add 1 day to tapos
+      tapos = tapos.add(1.days);
+      daysToStay.value = '${DateFormat('MMMM dd').format(simula)} - ${DateFormat('MMMM dd').format(tapos)}';
+      checkOutDate = DateFormat('MMMM dd, yyyy').format(tapos);
+      if (kDebugMode) print(daysToStay.value);
+
       if (args.value.endDate != null) {
         // rangeCount.value = args.value.endDate.difference(args.value.startDate).inDays + 1;
         noofdays.value = args.value.endDate.difference(args.value.startDate).inDays + 1;
