@@ -39,10 +39,26 @@ class PrintingView extends GetView {
                   textStyle: titleTextStyle,
                 ),
                 Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      height: 10.h,
-                    )),
+                  flex: 1,
+                  child: SizedBox(
+                    height: 10.h,
+                  ),
+                ),
+                SizedBox(
+                  height: 5.h,
+                  width: double.infinity,
+                  child: InkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Image.asset(
+                      ImageConstant.backArrow,
+                      fit: BoxFit.contain,
+                      height: 5.h,
+                      width: 5.w,
+                    ),
+                  ),
+                ),
                 SizedBox(
                   height: 3.h,
                   width: double.infinity,

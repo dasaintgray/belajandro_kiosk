@@ -15,6 +15,8 @@ class ReactiveRoomTypesModel {
   final String code;
   final int locationId;
   String description;
+  final String remarks;
+  final String picture;
   final List<Price> price;
   final Available available;
 
@@ -23,6 +25,8 @@ class ReactiveRoomTypesModel {
     required this.code,
     required this.locationId,
     required this.description,
+    required this.remarks,
+    required this.picture,
     required this.price,
     required this.available,
   });
@@ -32,6 +36,8 @@ class ReactiveRoomTypesModel {
         code: json["code"],
         locationId: json["LocationId"],
         description: json["description"],
+        remarks: json["remarks"],
+        picture: json["picture"],
         price: List<Price>.from(json["price"].map((x) => Price.fromJson(x))),
         available: Available.fromJson(json["available"]),
       );
@@ -41,6 +47,8 @@ class ReactiveRoomTypesModel {
         "code": code,
         "LocationId": locationId,
         "description": description,
+        "remarks": remarks,
+        "picture": picture,
         "price": List<dynamic>.from(price.map((x) => x.toJson())),
         "available": available.toJson(),
       };

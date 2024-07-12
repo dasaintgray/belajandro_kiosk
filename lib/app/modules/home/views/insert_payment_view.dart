@@ -9,6 +9,7 @@ import 'package:belajandro_kiosk/services/utils/styles_utils.dart';
 import 'package:belajandro_kiosk/widgets/headers_widget.dart';
 import 'package:belajandro_kiosk/widgets/loading_widget.dart';
 import 'package:belajandro_kiosk/widgets/title_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart' as rs;
 
@@ -140,45 +141,64 @@ class InsertPaymentView extends GetView {
                               final computeVat = hc.totalAmountDue.value / double.parse(vat);
                               final tax = hc.totalAmountDue.value - computeVat;
 
-                              hc.signalLEDLights(sCommandMode: LedlightsConstant.cashDispenserOFF, comPort: 'COM1');
-                              hc.signalLEDLights(sCommandMode: LedlightsConstant.printingON, comPort: 'COM1');
+                              hc.signalLEDLights(
+                                  sCommandMode: LedlightsConstant.cashDispenserOFF,
+                                  comPort: kDebugMode ? 'COM1' : hc.globalEnv['LED_LIGHTS_PORT']);
+                              hc.signalLEDLights(
+                                  sCommandMode: LedlightsConstant.printingON,
+                                  comPort: kDebugMode ? 'COM1' : hc.globalEnv['LED_LIGHTS_PORT']);
                               final response = hc.printResibo(
-                                  address: sc.sCompanyAddress.value,
-                                  owner: sc.sCOMPANY.value,
-                                  telephone: sc.settingsList.first.data.settings
-                                      .where((element) => element.code == 'R2')
-                                      .first
-                                      .value,
-                                  email: sc.settingsList.first.data.settings
-                                      .where((element) => element.code == 'R5')
-                                      .first
-                                      .value,
-                                  vatTin: 'vat',
-                                  bookingID: 123,
-                                  terminalID: hc.terminalNo,
-                                  qty: 1,
-                                  roomRate: hc.salapi.format(hc.totalAmountDue.value),
-                                  deposit: '0.00',
-                                  totalAmount: hc.salapi.format(hc.totalAmountDue.value),
-                                  totalAmountPaid: hc.salapi.format(hc.nabasangPera.value),
-                                  paymentMethod: hc.paymentTypeList
-                                      .where((element) => element.id == hc.selectedPaymentType.value)
-                                      .first
-                                      .description,
-                                  changeValue: hc.salapi.format(hc.overPayment.value),
-                                  currencyString: 'PHP',
-                                  vatTable: computeVat.toStringAsFixed(2),
-                                  vatTax: tax.toStringAsFixed(2),
-                                  roomNumber: hc.selectedRooNumber.value,
-                                  timeConsume: hc.daysToStay.value,
-                                  endTime: '${hc.checkOutDate} @ ${sc.checkOutTime}',
-                                  isOR: true);
+                                address: sc.sCompanyAddress.value,
+                                owner: sc.settingsList.first.data.settings
+                                    .where((element) => element.code == 'R13')
+                                    .first
+                                    .value,
+                                telephone: sc.settingsList.first.data.settings
+                                    .where((element) => element.code == 'R3')
+                                    .first
+                                    .value,
+                                email: sc.settingsList.first.data.settings
+                                    .where((element) => element.code == 'R5')
+                                    .first
+                                    .value,
+                                vatTin: '008-664-218-00000',
+                                bookingID: 123,
+                                terminalID: hc.terminalNo,
+                                qty: 1,
+                                roomRate: hc.salapi.format(hc.totalAmountDue.value),
+                                roomType: hc.reactiveRoomTypeList
+                                    .where((element) => element.id == hc.selectedRoomType.value)
+                                    .first
+                                    .description,
+                                deposit: '0.00',
+                                totalAmount: hc.salapi.format(hc.totalAmountDue.value),
+                                totalAmountPaid: hc.salapi.format(hc.nabasangPera.value),
+                                paymentMethod: hc.paymentTypeList
+                                    .where((element) => element.id == hc.selectedPaymentType.value)
+                                    .first
+                                    .description,
+                                changeValue: hc.salapi.format(hc.overPayment.value),
+                                currencyString: 'PHP',
+                                vatTable: computeVat.toStringAsFixed(2),
+                                vatTax: tax.toStringAsFixed(2),
+                                roomNumber: hc.selectedRooNumber.value,
+                                timeConsume: hc.daysToStay.value,
+                                endTime: '${hc.checkOutDate} @ ${sc.checkOutTime}',
+                                standardCI:
+                                    'Standard ${sc.settingsList.first.data.settings.where((element) => element.code == 'C1').first.description} : ${sc.settingsList.first.data.settings.where((element) => element.code == 'C1').first.value}',
+                                standardCO:
+                                    'Standard ${sc.settingsList.first.data.settings.where((element) => element.code == 'O1').first.description} : ${sc.settingsList.first.data.settings.where((element) => element.code == 'O1').first.value}',
+                                isOR: false,
+                                isSelfCheck: false,
+                              );
                               if (response) {
-                                hc.signalLEDLights(sCommandMode: LedlightsConstant.printingOFF, comPort: 'COM1');
+                                hc.signalLEDLights(
+                                    sCommandMode: LedlightsConstant.printingOFF,
+                                    comPort: kDebugMode ? 'COM1' : hc.globalEnv['LED_LIGHTS_PORT']);
 
-                                Get.to(
-                                  () => PrintingView(),
-                                );
+                                // Get.to(
+                                //   () => PrintingView(),
+                                // );
                               }
                             }
                           },

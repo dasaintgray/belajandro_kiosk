@@ -96,6 +96,14 @@ packages:
       relative: true
     source: path
     version: "0.0.7"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      sha256: "831883fb353c8bdc1d71979e5b342c7d88acfbc643113c14ae51e2442ea0f20f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.17.3"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -189,6 +197,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.0"
+  flutter_html_reborn:
+    dependency: "direct main"
+    description:
+      name: flutter_html_reborn
+      sha256: aada9f12e80a31562575e39350846152b61a67a283cf66092be6fdfd5aa07907
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   flutter_libserialport:
     dependency: "direct main"
     description:
@@ -250,6 +266,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0+3"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      sha256: "3a7812d5bcd2894edf53dfaf8cd640876cf6cef50a8f238745c8b8120ea74d3a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.4"
   http:
     dependency: "direct main"
     description:
@@ -314,6 +338,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  list_counter:
+    dependency: transitive
+    description:
+      name: list_counter
+      sha256: c447ae3dfcd1c55f0152867090e67e219d42fe6d4f2807db4bbe8b8d69912237
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   lottie:
     dependency: "direct main"
     description:
@@ -455,6 +487,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.1"
+  stacked_list_carousel:
+    dependency: "direct main"
+    description:
+      name: stacked_list_carousel
+      sha256: c0bc7cf00aa706af686b180a15c73878c7bb1b12bfd3d3e0777c44e5e9eedc5f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   stream_channel:
     dependency: transitive
     description:

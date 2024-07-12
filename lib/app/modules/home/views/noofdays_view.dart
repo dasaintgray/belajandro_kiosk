@@ -46,7 +46,7 @@ class NoofdaysView extends GetView {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 40.h,
+                        height: orientation == Orientation.portrait ? 40.h : 30.h,
                         width: 90.w,
                         child: SfDateRangePicker(
                           onSelectionChanged: hc.onSelectionChanged,
@@ -60,12 +60,14 @@ class NoofdaysView extends GetView {
                           startRangeSelectionColor: HenryColors.lightGold,
                           endRangeSelectionColor: HenryColors.lightGold,
                           rangeSelectionColor: HenryColors.lightGold.withOpacity(0.3),
-                          selectionTextStyle: TextStyle(fontSize: 15.sp, fontFamily: bernardMT),
-                          rangeTextStyle: TextStyle(fontSize: 15.sp, fontFamily: bernardMT),
+                          selectionTextStyle: TextStyle(
+                              fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp, fontFamily: bernardMT),
+                          rangeTextStyle: TextStyle(
+                              fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp, fontFamily: bernardMT),
                           headerStyle: DateRangePickerHeaderStyle(
                             textStyle: TextStyle(
                               color: HenryColors.lightGold,
-                              fontSize: 15.sp,
+                              fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp,
                               fontWeight: FontWeight.bold,
                               fontFamily: bernardMT,
                             ),
@@ -75,7 +77,8 @@ class NoofdaysView extends GetView {
                             viewHeaderHeight: 60,
                             weekendDays: const [7],
                             viewHeaderStyle: DateRangePickerViewHeaderStyle(
-                              textStyle: TextStyle(fontSize: 15.sp, fontFamily: bernardMT),
+                              textStyle: TextStyle(
+                                  fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp, fontFamily: bernardMT),
                             ),
                             // weekNumberStyle: DateRangePickerWeekNumberStyle(
                             //   textStyle: TextStyle(
@@ -85,13 +88,20 @@ class NoofdaysView extends GetView {
                             // ),
                           ),
                           monthCellStyle: DateRangePickerMonthCellStyle(
-                            weekendTextStyle:
-                                TextStyle(color: HenryColors.blueAccent, fontFamily: bernardMT, fontSize: 15.sp),
-                            specialDatesTextStyle:
-                                TextStyle(color: HenryColors.pula, fontFamily: bernardMT, fontSize: 15.sp),
-                            textStyle: TextStyle(fontSize: 15.sp, color: HenryColors.itim, fontFamily: bernardMT),
+                            weekendTextStyle: TextStyle(
+                                color: HenryColors.blueAccent,
+                                fontFamily: bernardMT,
+                                fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp),
+                            specialDatesTextStyle: TextStyle(
+                                color: HenryColors.pula,
+                                fontFamily: bernardMT,
+                                fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp),
+                            textStyle: TextStyle(
+                                fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp,
+                                color: HenryColors.itim,
+                                fontFamily: bernardMT),
                             todayTextStyle: TextStyle(
-                              fontSize: 15.sp,
+                              fontSize: orientation == Orientation.portrait ? 15.sp : 12.sp,
                               fontFamily: bernardMT,
                               color: HenryColors.gold,
                             ),

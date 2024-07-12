@@ -248,7 +248,7 @@ class HomeController extends GetxController {
     middleName.dispose();
   }
 
-  void initEmailSender() {
+  void initEmailSender({required bool? isSSL}) {
     EmailOTP.config(
       appName: globalEnv['APP_NAME'] ?? 'Belajandro Hotel Kiosk System',
       appEmail: globalEnv['APP_EMAIL'] ?? 'kiosk@belajandrohotel.com',
@@ -257,8 +257,8 @@ class HomeController extends GetxController {
     );
 
     EmailOTP.setSMTP(
-      emailPort: EmailPort.port587,
-      secureType: SecureType.tls,
+      emailPort: isSSL! ? EmailPort.port465 : EmailPort.port587,
+      secureType: isSSL ? SecureType.ssl : SecureType.tls,
       host: globalEnv['EMAIL_HOST'] ?? 'smtp.mailersend.net',
       username: globalEnv['EMAIL_USERNAME'] ?? 'MS_RmErOq@trial-7dnvo4dk9z3l5r86.mlsender.net',
       password: globalEnv['EMAIL_PASSWORD'] ?? 'xs319c5CerQ7fLyA',
@@ -295,13 +295,15 @@ class HomeController extends GetxController {
   }
 
   Future<bool> setupEmail({required String? emailAddressToSend}) async {
-    initEmailSender();
+    initEmailSender(isSSL: bool.parse(globalEnv['USE_SSL'].toString()));
     final response = await EmailOTP.sendOTP(email: emailAddressToSend!);
     if (response) {
       return true;
     }
     return false;
   }
+
+
 
   /// TRANSACTION
   /// --------------------------------------------------------------------------
@@ -823,6 +825,7 @@ class HomeController extends GetxController {
     required int? terminalID,
     required int? qty,
     required String? roomRate,
+    required String? roomType,
     required String? deposit,
     required String? totalAmount,
     required String? totalAmountPaid,
@@ -834,8 +837,11 @@ class HomeController extends GetxController {
     required String? roomNumber,
     required String? timeConsume,
     required String? endTime,
+    String? standardCI,
+    String? standardCO,
     // required DateTime? endTime,
     required bool? isOR,
+    required bool? isSelfCheck,
   }) {
     // final libPath = Platform.script.resolve("assets/hardware/Msprintsdkx64.dll").path;
     // final logoPath = Platform.script.resolve("assets/logo/iotel.bmp").path;
@@ -875,157 +881,172 @@ class HomeController extends GetxController {
             int Function(int, int, int, int)>("SetSizechar");
         final printQrcode = dylib.lookupFunction<ffi.Int32 Function(ffi.Pointer<Utf8>, ffi.Int32, ffi.Int32, ffi.Int32),
             int Function(ffi.Pointer<Utf8>, int, int, int)>("PrintQrcode");
+        final printSelfCheck = dylib.lookupFunction<ffi.Int32 Function(), int Function()>('PrintSelfcheck');
 
         // begin to use the function
         final initResponse = setInit();
         if (initResponse == 0) {
-          setCommandmode(3);
-          setAlignment(1);
-          // printFeedline(1);
-          // printDiskbmpfile(logoPath.substring(1, logoPath.length).toNativeUtf8());
-          printDiskbmpfile('assets/img/logo.bmp'.toNativeUtf8());
-          //
-          // printDiskbmpfile(emailPath.substring(1, emailPath.length).toNativeUtf8());
-          setClean();
-          printFeedline(1);
-          setAlignment(1);
-          setSizetext(1, 1);
-          setSizechar(1, 1, 1, 1);
-          printString(address.toString().toNativeUtf8(), 0);
-          printString('Owned & Operated by:'.toNativeUtf8(), 0);
-          setBold(1);
-          printString(owner.toString().toNativeUtf8(), 0);
-          setBold(0);
-          printFeedline(1);
-          printString('VAT REG TIN: $vatTin'.toNativeUtf8(), 0);
-          // printDiskbmpfile(telephonePath.substring(1, telephonePath.length).toNativeUtf8());
-          printString(telephone.toString().toNativeUtf8(), 0);
-          // printDiskbmpfile(emailPath.substring(1, emailPath.length).toNativeUtf8());
-          printString('$email'.toNativeUtf8(), 0);
-          printString(ngayongAraw.toNativeUtf8(), 0);
-          printFeedline(1);
-          setAlignment(0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('RCPT#: $bookingID'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('TERMINAL# $terminalID'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('BRANCH#: 1'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('SERIAL# '.toNativeUtf8(), 0);
-          setClean();
-          setAlignment(0);
-          printString('MIN #: '.toNativeUtf8(), 0);
-          printFeedline(1);
+          if (isSelfCheck!) {
+            printSelfCheck();
+          } else {
+            setCommandmode(3);
+            setAlignment(1);
+            // printFeedline(1);
+            // printDiskbmpfile(logoPath.substring(1, logoPath.length).toNativeUtf8());
+            printDiskbmpfile('assets/img/logo.bmp'.toNativeUtf8());
+            //
+            // printDiskbmpfile(emailPath.substring(1, emailPath.length).toNativeUtf8());
+            setClean();
+            printFeedline(1);
+            setAlignment(1);
+            // setSizetext(1, 1);
+            setSizechar(0, 0, 0, 1);
+            printString(address.toString().toNativeUtf8(), 0);
+            printString('Owned & Operated by:'.toNativeUtf8(), 0);
+            setBold(1);
+            printString(owner.toString().toNativeUtf8(), 0);
+            setBold(0);
+            printFeedline(1);
+            printString('VAT REG TIN: $vatTin'.toNativeUtf8(), 0);
+            // printDiskbmpfile(telephonePath.substring(1, telephonePath.length).toNativeUtf8());
+            printString(telephone.toString().toNativeUtf8(), 0);
+            // printDiskbmpfile(emailPath.substring(1, emailPath.length).toNativeUtf8());
+            printString('$email'.toNativeUtf8(), 0);
+            printString(ngayongAraw.toNativeUtf8(), 0);
+            printFeedline(1);
+            setAlignment(0);
+            setClean();
+            setAlignmentLeftRight(0);
+            // setSizetext(1, 1);
+            printString('RCPT#: $bookingID'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('TERMINAL# $terminalID'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            // printString('BRANCH#: 1'.toNativeUtf8(), 1);
+            // setAlignmentLeftRight(2);
+            // printString('SERIAL# '.toNativeUtf8(), 0);
+            // setClean();
+            // setAlignment(0);
+            // printString('MIN #: '.toNativeUtf8(), 0);
+            printFeedline(1);
 
-          // DITO YUNG MGA CHARGES
-          // setClean();
-          setAlignment(1);
-          setBold(1);
-          printString('[ Acknowledgement Receipt ]'.toNativeUtf8(), 0);
-          setBold(0);
-          printFeedline(1);
-          setClean();
-          setAlignment(0);
-          // setClean();
-          printString('ROOM'.toNativeUtf8(), 0);
-          // setClean();
-          setAlignmentLeftRight(0);
-          printString('  x$qty'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString ${roomRate!}'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('KEY CARD DEPOSIT'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString ${deposit!}'.toNativeUtf8(), 0);
-          setClean();
+            // DITO YUNG MGA CHARGES
+            setClean();
+            setAlignment(1);
+            setBold(1);
+            printString('[ Acknowledgement Receipt ]'.toNativeUtf8(), 0);
+            setBold(0);
+            printFeedline(1);
+            setClean();
+            setAlignment(0);
+            // setClean();
+            printString('ROOM: $roomType'.toNativeUtf8(), 0); //MAGLAGAY NG ROOM TYPE
+            // setClean();
+            setAlignmentLeftRight(0);
+            printString('  x$qty'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString ${roomRate!}'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('SECURITY DEPOSIT'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString ${deposit!}'.toNativeUtf8(), 0);
+            setClean();
 
-          printString('------------------------------------------------'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('TOTAL'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString ${totalAmount!}'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('$paymentMethod'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString $totalAmountPaid'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('CHANGE'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString $changeValue'.toNativeUtf8(), 0);
-          printFeedline(1);
-          setAlignmentLeftRight(0);
-          printString('VATable '.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString ${vatTable!}'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('VAT_Tax'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString ${vatTax!}'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('ZERO_Rated'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString 0.00'.toNativeUtf8(), 0);
-          setClean();
-          setAlignmentLeftRight(0);
-          printString('VAT Exempted'.toNativeUtf8(), 1);
-          setAlignmentLeftRight(2);
-          printString('$currencyString 0.00'.toNativeUtf8(), 0);
-          setClean();
+            printString('------------------------------------------------'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('TOTAL'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString ${totalAmount!}'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('PAYMENT MODE: $paymentMethod'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString $totalAmountPaid'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('CHANGE'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString $changeValue'.toNativeUtf8(), 0);
+            printFeedline(1);
+            setAlignmentLeftRight(0);
+            printString('VATable '.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString ${vatTable!}'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('VAT_Tax'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString ${vatTax!}'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('ZERO_Rated'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString 0.00'.toNativeUtf8(), 0);
+            setClean();
+            setAlignmentLeftRight(0);
+            printString('VAT Exempted'.toNativeUtf8(), 1);
+            setAlignmentLeftRight(2);
+            printString('$currencyString 0.00'.toNativeUtf8(), 0);
+            setClean();
 
-          // ignore: dead_code
-          if (isOR!) {
-            printString('SOLD TO-----------------------------------------'.toNativeUtf8(), 0);
-            printString('NAME--------------------------------------------'.toNativeUtf8(), 0);
-            printString('ADDRESS-----------------------------------------'.toNativeUtf8(), 0);
-            printString('TIN#--------------------------------------------'.toNativeUtf8(), 0);
-            printString('BUSINESS STYLE ---------------------------------'.toNativeUtf8(), 0);
+            // ignore: dead_code
+            if (isOR!) {
+              printString('SOLD TO-----------------------------------------'.toNativeUtf8(), 0);
+              printString('NAME--------------------------------------------'.toNativeUtf8(), 0);
+              printString('ADDRESS-----------------------------------------'.toNativeUtf8(), 0);
+              printString('TIN#--------------------------------------------'.toNativeUtf8(), 0);
+              printString('BUSINESS STYLE ---------------------------------'.toNativeUtf8(), 0);
+            }
+
+            // setUnderline(1);
+            printFeedline(1);
+            setAlignment(1);
+            setSizetext(2, 2);
+            printString('WELCOME GUEST'.toNativeUtf8(), 0);
+            printFeedline(1);
+            setSizetext(1, 1);
+            printString('YOUR ASSIGNED ROOM NUMBER'.toNativeUtf8(), 0);
+            setSizetext(3, 4);
+            printString('$roomNumber'.toNativeUtf8(), 0);
+            printFeedline(1);
+            setSizetext(1, 1);
+            printString("YOU'RE STAYING WITH US FOR".toNativeUtf8(), 0);
+            // setSizetext(2, 2);
+            printString("$timeConsume".toNativeUtf8(), 0);
+            printFeedline(1);
+            setSizetext(1, 1);
+            printString("YOU'RE CHECK-OUT TIME IS:".toNativeUtf8(), 0);
+            setSizetext(2, 2);
+            // printString(checkout.toNativeUtf8(), 0);
+            printString(checkout!.toNativeUtf8(), 0);
+            printFeedline(2);
+            setSizetext(1, 1);
+            printString('Please dial 0 if you need assistance'.toNativeUtf8(), 0);
+            printString('Enjoy you stay'.toNativeUtf8(), 0);
+            // printFeedline(2);
+            printString(standardCI!.toNativeUtf8(), 0);
+            printString(standardCO!.toNativeUtf8(), 0);
+            // printString('THIS OFFICIAL RECEIPT SHALL BE VALID'.toNativeUtf8(), 0);
+            // printString('FOR FIVE(5) YEARS FROM THE DATE OF ATP'.toNativeUtf8(), 0);
+            // printFeedline(1);
+            setClean();
+            printFeedline(1);
+            setAlignment(0);
+            printQrcode('www.belajandrohotel.com'.toNativeUtf8(), 25, 8, 0);
+            setClean();
+            setAlignment(1);
+            printString('www.circuitmindz.com'.toNativeUtf8(), 0);
+            setClean();
+
+            printFeedDot(100);
+            printCutpaper(0);
+            setClean();
+            setClose();
           }
 
-          // setUnderline(1);
-          printFeedline(1);
-          setAlignment(1);
-          setSizetext(2, 2);
-          printString('WELCOME GUEST'.toNativeUtf8(), 0);
-          printFeedline(1);
-          setSizetext(1, 1);
-          printString('YOUR ASSIGNED ROOM NUMBER'.toNativeUtf8(), 0);
-          setSizetext(3, 4);
-          printString('$roomNumber'.toNativeUtf8(), 0);
-          printFeedline(1);
-          setSizetext(1, 1);
-          printString("YOU'RE STAYING WITH US FOR".toNativeUtf8(), 0);
-          // setSizetext(2, 2);
-          printString("$timeConsume".toNativeUtf8(), 0);
-          printFeedline(2);
-          setSizetext(1, 1);
-          printString("YOU'RE CHECK-OUT TIME IS:".toNativeUtf8(), 0);
-          setSizetext(2, 2);
-          // printString(checkout.toNativeUtf8(), 0);
-          printString(checkout!.toNativeUtf8(), 0);
-          printFeedline(2);
-          setSizetext(1, 1);
-          printString('Please dial 0 if you need assistance'.toNativeUtf8(), 0);
-          printString('Enjoy you stay'.toNativeUtf8(), 0);
-          printFeedline(2);
-          // printString('THIS OFFICIAL RECEIPT SHALL BE VALID'.toNativeUtf8(), 0);
-          // printString('FOR FIVE(5) YEARS FROM THE DATE OF ATP'.toNativeUtf8(), 0);
-          // printFeedline(1);
-          printQrcode('WWW.CIRCUITMINDZ.COM'.toNativeUtf8(), 0, 5, 0);
-          printString('www.circuitmindz.com'.toNativeUtf8(), 0);
-
-          printFeedDot(100);
-          printCutpaper(0);
-          setClean();
-          setClose();
           return true;
         }
       }
@@ -1197,6 +1218,10 @@ class HomeController extends GetxController {
   Future<String?> iTranslate({required String languageCode, required String sourceText}) async {
     final response = await isalin.translate(sourceText, to: languageCode);
     return response.toString();
+  }
+
+  Uint8List loadImage(String base64) {
+    return base64Decode(base64);
   }
 
   void clearToDefault() {

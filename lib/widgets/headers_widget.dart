@@ -70,8 +70,8 @@ class WeatherAndClock extends StatelessWidget {
                     flex: 2,
                     child: SizedBox(
                       // color: HenryColors.blueAccent,
-                      height: orientation == Orientation.landscape ? 13.h : 13.h,
-                      width: 10.w,
+                      height: orientation == Orientation.landscape ? 14.h : 13.h,
+                      width: 30.w,
                       child: Column(
                         children: [
                           SizedBox(
@@ -98,7 +98,7 @@ class WeatherAndClock extends StatelessWidget {
                               sc.sCompanyAddress.value,
                               style: TextStyle(
                                 color: HenryColors.puti,
-                                fontSize: 10.sp,
+                                fontSize: 9.sp,
                               ),
                               textAlign: TextAlign.center,
                             ),

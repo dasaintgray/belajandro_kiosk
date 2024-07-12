@@ -258,6 +258,8 @@ class GQLData {
       code
       LocationId
       description
+      remarks
+      picture
       price: vrtrs(where: {AgentId: {_eq: $agentID}, isActive: {_eq: true}, isHidden: {_eq: false}}, limit: 1) {
         rate
       }

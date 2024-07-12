@@ -93,7 +93,9 @@ class GuestInfoView extends GetView {
                             child: SingleChildScrollView(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: hc.isRegistered.value ? existingUser() : newUserRegistration(),
+                                child: hc.isRegistered.value
+                                    ? existingUser(orientation)
+                                    : newUserRegistration(orientation),
                               ),
                             ),
                           ),
@@ -198,7 +200,7 @@ class GuestInfoView extends GetView {
     );
   }
 
-  Widget existingUser() {
+  Widget existingUser(Orientation orientation) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -386,7 +388,7 @@ class GuestInfoView extends GetView {
     );
   }
 
-  Widget newUserRegistration() {
+  Widget newUserRegistration(Orientation orientation) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
